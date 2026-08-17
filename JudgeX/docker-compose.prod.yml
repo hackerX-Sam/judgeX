@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: judgex_db_prod
+    environment:
+      POSTGRES_USER: judgex_user
+      POSTGRES_PASSWORD: judgex_password
+      POSTGRES_DB: judgex
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: judgex_redis_prod
+    volumes:
+      - redisdata_prod:/data
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: ./backend
+    container_name: judgex_backend_prod
+    environment:
+      - DATABASE_URL=postgresql://judgex_user:judgex_password@postgres:5432/judgex
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=3000
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./worker
+    container_name: judgex_worker_prod
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: judgex_nginx_prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata_prod:
+  redisdata_prod:
