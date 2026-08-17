@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  username       String       @unique
+  passwordHash   String?
+  fullName       String
+  profilePic     String?
+  country        String?
+  institution    String?
+  github         String?
+  linkedin       String?
+  provider       String       @default("local")
+  providerId     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  submissions    Submission[]
+}
+
+model Problem {
+  id          String       @id @default(uuid())
+  title       String
+  slug        String       @unique
+  description String       // Markdown content
+  difficulty  String       // Easy, Medium, Hard
+  timeLimit   Int          // in milliseconds
+  memoryLimit Int          // in megabytes
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  testCases   TestCase[]
+  submissions Submission[]
+}
+
+model TestCase {
+  id             String   @id @default(uuid())
+  problemId      String
+  problem        Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  input          String
+  expectedOutput String
+  isHidden       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Submission {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemId     String
+  problem       Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  code          String
+  language      String   // cpp, python, javascript
+  status        String   // PENDING, ACCEPTED, WRONG_ANSWER, TLE, MLE, COMPILATION_ERROR, RUNTIME_ERROR
+  executionTime Int?     // in milliseconds
+  memoryUsed    Int?     // in megabytes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

@@ -1,0 +1,289 @@
+/* ContestsPage.css */
+
+.contests-page {
+  background-color: var(--bg-primary, #0f172a);
+  min-height: 100vh;
+  color: var(--text-primary, #f8fafc);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.contests-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .contests-container {
+    flex-direction: column;
+  }
+}
+
+/* Left Content Area */
+.contests-main {
+  flex: 1;
+}
+
+/* Hero Section (Active Contests) */
+.contests-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 768px) {
+  .contests-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.hero-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.hero-weekly {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.hero-biweekly {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.hero-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent 50%);
+  pointer-events: none;
+}
+
+.card-badge {
+  background: rgba(0,0,0,0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.hero-card h2 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.hero-card p {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem 0;
+  z-index: 2;
+}
+
+.hero-card .countdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: rgba(0,0,0,0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  z-index: 2;
+}
+
+.btn-register {
+  background: #fff;
+  color: #0f172a;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.btn-register:hover {
+  background: #f8fafc;
+}
+
+/* Section Titles */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  color: var(--text-primary, #fff);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+/* Past Contests */
+.past-contests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.past-contest-card {
+  background: var(--bg-secondary, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.past-contest-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary, #38bdf8);
+}
+
+.past-contest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.past-contest-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  margin: 0;
+}
+
+.past-contest-date {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.btn-virtual {
+  margin-top: auto;
+  align-self: flex-start;
+  background: transparent;
+  color: var(--accent-primary, #38bdf8);
+  border: 1px solid var(--accent-primary, #38bdf8);
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-virtual:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+
+/* Right Sidebar */
+.contests-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .contests-sidebar {
+    width: 100%;
+  }
+}
+
+.sidebar-widget {
+  background: var(--bg-secondary, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.widget-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  color: var(--text-primary, #fff);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ranking-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  color: var(--text-primary, #fff);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.rating-value {
+  color: #10b981;
+}
+
+/* Auth Prompt Widget */
+.auth-prompt {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.auth-prompt p {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.btn-login-outline {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--border-color, #334155);
+  background: transparent;
+  color: var(--text-primary, #fff);
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-login-outline:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--text-tertiary, #64748b);
+}

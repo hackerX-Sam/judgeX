@@ -1,0 +1,188 @@
+.workspace-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.workspace-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #262626;
+  border-bottom: 1px solid #333;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  color: #a3a3a3;
+  text-decoration: none;
+  font-size: 14px;
+}
+.back-link:hover { color: #fff; }
+.workspace-title { font-weight: 600; }
+.nav-placeholder { width: 120px; }
+
+.workspace-split {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.workspace-pane {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-divider {
+  width: 8px;
+  background-color: #121212;
+  cursor: col-resize;
+}
+
+/* Problem Description Panel */
+.problem-description-container {
+  padding: 24px;
+}
+.problem-header h1 {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+}
+.problem-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.difficulty-badge, .limit-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #333;
+}
+.difficulty-badge.easy { color: #00b8a3; background: rgba(0, 184, 163, 0.15); }
+.difficulty-badge.medium { color: #ffc01e; background: rgba(255, 192, 30, 0.15); }
+.difficulty-badge.hard { color: #ff375f; background: rgba(255, 55, 95, 0.15); }
+
+.markdown-content {
+  line-height: 1.6;
+  color: #d4d4d4;
+  font-size: 15px;
+}
+.markdown-content pre {
+  background: #2a2a2a;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.markdown-content code {
+  background: #2a2a2a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.test-cases-section { margin-top: 32px; }
+.example-card {
+  margin-bottom: 20px;
+}
+.io-block {
+  background: #2a2a2a;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #d4d4d4;
+}
+.io-block pre {
+  margin: 4px 0 12px 0;
+  white-space: pre-wrap;
+}
+
+/* Code Editor Panel */
+.code-editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1e1e1e;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #1a1a1a;
+  flex-shrink: 0;
+}
+.language-select {
+  background: #3c3c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  outline: none;
+}
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-run, .btn-submit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-run { background: #3c3c3c; color: white; }
+.btn-run:hover { background: #4d4d4d; }
+.btn-submit { background: #2cbb5d; color: white; }
+.btn-submit:hover { background: #26a652; }
+
+.editor-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.console-panel {
+  height: 150px;
+  background: #1e1e1e;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+.console-header {
+  padding: 8px 16px;
+  background: #2d2d2d;
+  font-size: 13px;
+  font-weight: 500;
+  color: #a3a3a3;
+}
+.console-content {
+  padding: 16px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #2cbb5d;
+  overflow-y: auto;
+}
+
+.workspace-loading, .workspace-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #a3a3a3;
+  background: #1a1a1a;
+}
