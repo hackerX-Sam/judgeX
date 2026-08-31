@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config';
 import './ActivityGraph.css';
 
 interface ActivityGraphProps {
@@ -13,7 +14,7 @@ const ActivityGraph: React.FC<ActivityGraphProps> = ({ userId }) => {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/submissions/activity/${userId}`);
+        const response = await axios.get(`${API_URL}/api/submissions/activity/${userId}`);
         setActivity(response.data.activity);
       } catch (err) {
         console.error('Failed to fetch activity', err);

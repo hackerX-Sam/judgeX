@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from '../../components/Navbar';
 import axios from 'axios';
+import { API_URL } from '../../config';
 import Editor from '@monaco-editor/react';
 import { Play, Save, Settings, Share2, BookOpen, ChevronDown, PenLine, Code2 } from 'lucide-react';
 import './Playground.css';
@@ -26,7 +27,7 @@ export default function Playground() {
     setOutput('Compiling and running...');
     
     try {
-      const response = await axios.post('http://localhost:3000/api/submissions/execute/playground', {
+      const response = await axios.post(`${API_URL}/api/submissions/execute/playground`, {
         code,
         language
       });

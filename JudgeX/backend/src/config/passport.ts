@@ -10,7 +10,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || 'mock_google_client_id',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'mock_google_client_secret',
-      callbackURL: 'http://localhost:3000/api/auth/google/callback',
+      callbackURL: `${process.env.BACKEND_URL || 'http://localhost:3000'}/api/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -58,7 +58,7 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID || 'mock_github_client_id',
       clientSecret: process.env.GITHUB_CLIENT_SECRET || 'mock_github_client_secret',
-      callbackURL: 'http://localhost:3000/api/auth/github/callback',
+      callbackURL: `${process.env.BACKEND_URL || 'http://localhost:3000'}/api/auth/github/callback`,
     },
     async (accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {

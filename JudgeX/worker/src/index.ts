@@ -5,6 +5,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
+
 const redisConnection = {
   host: '127.0.0.1',
   port: 6379,
@@ -23,7 +25,7 @@ const worker = new Worker('submissionQueue', async (job: Job) => {
 
   try {
     // 1. Fetch all test cases from the backend API
-    const response = await axios.get(`http://localhost:3000/api/problems/${problemId}/testcases/all`);
+    const response = await axios.get(`${BACKEND_URL}/api/problems/${problemId}/testcases/all`);
     const testCases = response.data.testCases;
 
     if (!testCases || testCases.length === 0) {
@@ -67,11 +69,11 @@ const worker = new Worker('submissionQueue', async (job: Job) => {
     // 3. Update the submission status in the backend
     if (job.data.isVerification) {
       const { originalSubmissionId } = job.data;
-      await axios.put(`http://localhost:3000/api/submissions/${originalSubmissionId}/intelligence`, {
+      await axios.put(`${BACKEND_URL}/api/submissions/${originalSubmissionId}/intelligence`, {
         improvementStatus: finalStatus === 'ACCEPTED' ? 'VERIFIED_IMPROVEMENT' : 'FAILED_VERIFICATION'
       });
     } else {
-      await axios.put(`http://localhost:3000/api/submissions/${submissionId}`, {
+      await axios.put(`${BACKEND_URL}/api/submissions/${submissionId}`, {
         status: finalStatus,
         errorMessage,
         runtime: maxRuntime,
@@ -80,7 +82,7 @@ const worker = new Worker('submissionQueue', async (job: Job) => {
       
       // Trigger AI analysis if it was a normal submission
       try {
-        await axios.post(`http://localhost:3000/api/submissions/${submissionId}/analyze`);
+        await axios.post(`${BACKEND_URL}/api/submissions/${submissionId}/analyze`);
       } catch (e: any) {
         console.error('Failed to trigger AI analysis:', e.message);
       }
@@ -90,7 +92,7 @@ const worker = new Worker('submissionQueue', async (job: Job) => {
 
   } catch (error: any) {
     console.error(`[Job ${job.id}] Error:`, error.message);
-    await axios.put(`http://localhost:3000/api/submissions/${submissionId}`, {
+    await axios.put(`${BACKEND_URL}/api/submissions/${submissionId}`, {
       status: 'RUNTIME_ERROR',
       errorMessage: 'Internal worker error: ' + error.message
     }).catch(e => console.error('Failed to report error to backend:', e.message));

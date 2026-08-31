@@ -6,6 +6,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const router = Router();
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Local Registration
 router.post('/register', async (req, res) => {
@@ -121,10 +122,10 @@ router.get('/google/callback',
     // Simulated path for quick local testing without setting up GCP credentials
     if (req.query.simulated === 'true') {
       const mockToken = jwt.sign({ id: 'mock123', email: 'mock@example.com' }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-      return res.redirect(`http://localhost:5173/home?token=${mockToken}`);
+      return res.redirect(`${FRONTEND_URL}/home?token=${mockToken}`);
     }
     
-    passport.authenticate('google', { session: false, failureRedirect: 'http://localhost:5173/login?error=true' })(req, res, next);
+    passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=true` })(req, res, next);
   },
   (req, res) => {
     // Successful authentication
@@ -138,7 +139,7 @@ router.get('/google/callback',
     );
     
     // Redirect to frontend with token
-    res.redirect(`http://localhost:5173/home?token=${token}`);
+    res.redirect(`${FRONTEND_URL}/home?token=${token}`);
   }
 );
 
@@ -156,10 +157,10 @@ router.get('/github/callback',
   (req, res, next) => {
     if (req.query.simulated === 'true') {
       const mockToken = jwt.sign({ id: 'mock456', email: 'mock_github@example.com' }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-      return res.redirect(`http://localhost:5173/home?token=${mockToken}`);
+      return res.redirect(`${FRONTEND_URL}/home?token=${mockToken}`);
     }
     
-    passport.authenticate('github', { session: false, failureRedirect: 'http://localhost:5173/login?error=true' })(req, res, next);
+    passport.authenticate('github', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=true` })(req, res, next);
   },
   (req, res) => {
     const user: any = req.user;
@@ -168,7 +169,7 @@ router.get('/github/callback',
       process.env.JWT_SECRET || 'secret', 
       { expiresIn: '7d' }
     );
-    res.redirect(`http://localhost:5173/home?token=${token}`);
+    res.redirect(`${FRONTEND_URL}/home?token=${token}`);
   }
 );
 

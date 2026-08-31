@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ChevronLeft } from 'lucide-react';
+import { API_URL } from '../../config';
 import ProblemDescription from './ProblemDescription';
 import CodeEditorPanel from './CodeEditorPanel';
 import './Workspace.css';
@@ -14,7 +15,7 @@ export default function Workspace() {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/problems/${slug}`);
+        const response = await axios.get(`${API_URL}/api/problems/${slug}`);
         setProblem(response.data.problem);
       } catch (error) {
         console.error('Error fetching problem:', error);

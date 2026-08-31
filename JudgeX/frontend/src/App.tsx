@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
 import { setCredentials } from './store/slices/authSlice';
 import axios from 'axios';
+import { API_URL } from './config';
 import { CheckCircle2, Circle, Lock, ChevronRight, Search, Library, Target, Compass, GraduationCap, UserCircle2, Star, Clock, Play, Terminal } from 'lucide-react';
 import './index.css';
 import './App.css';
@@ -26,12 +27,12 @@ const ProblemsPage = () => {
   useEffect(() => {
     const fetchProblems = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/problems');
+        const response = await axios.get(`${API_URL}/api/problems`);
         
         let solvedIds: string[] = [];
         if (user) {
           try {
-            const solvedResponse = await axios.get(`http://localhost:3000/api/submissions/solved/${user.id}`);
+            const solvedResponse = await axios.get(`${API_URL}/api/submissions/solved/${user.id}`);
             solvedIds = solvedResponse.data.solvedProblemIds || [];
           } catch (e) {
             console.error('Error fetching solved problems:', e);

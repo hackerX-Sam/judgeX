@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Play, Send, Brain, Wand2, Lightbulb } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
+import { API_URL } from '../../config';
 
 interface Props {
   problem: any;
@@ -48,12 +49,12 @@ export default function CodeEditorPanel({ problem }: Props) {
     if (!submissionId) return;
     setIsImproving(true);
     try {
-      await axios.post(`http://localhost:3000/api/submissions/${submissionId}/improve`);
+      await axios.post(`${API_URL}/api/submissions/${submissionId}/improve`);
       
       // Poll for improvement status
       const interval = setInterval(async () => {
         try {
-          const checkRes = await axios.get(`http://localhost:3000/api/submissions/${submissionId}`);
+          const checkRes = await axios.get(`${API_URL}/api/submissions/${submissionId}`);
           const sub = checkRes.data.submission;
           if (sub.intelligence?.improvementStatus !== 'PENDING') {
             clearInterval(interval);
@@ -90,7 +91,7 @@ export default function CodeEditorPanel({ problem }: Props) {
     setIsAnalyzing(false);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/submissions', {
+      const response = await axios.post(`${API_URL}/api/submissions`, {
         problemId: problem.id,
         code,
         language,
@@ -106,7 +107,7 @@ export default function CodeEditorPanel({ problem }: Props) {
       
       pollIntervalRef.current = setInterval(async () => {
         try {
-          const checkRes = await axios.get(`http://localhost:3000/api/submissions/${sid}`);
+          const checkRes = await axios.get(`${API_URL}/api/submissions/${sid}`);
           const sub = checkRes.data.submission;
           
           if (sub.status !== 'PENDING') {
@@ -139,7 +140,7 @@ export default function CodeEditorPanel({ problem }: Props) {
   const pollForIntelligence = (sid: string) => {
     const aiInterval = setInterval(async () => {
       try {
-        const checkRes = await axios.get(`http://localhost:3000/api/submissions/${sid}`);
+        const checkRes = await axios.get(`${API_URL}/api/submissions/${sid}`);
         const intl = checkRes.data.submission.intelligence;
         if (intl) {
           clearInterval(aiInterval);
