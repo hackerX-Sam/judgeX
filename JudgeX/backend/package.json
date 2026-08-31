@@ -25,10 +25,12 @@
     "jsonwebtoken": "^9.0.3",
     "leetcode-query": "^2.0.1",
     "morgan": "^1.11.0",
+    "openai": "^7.5.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

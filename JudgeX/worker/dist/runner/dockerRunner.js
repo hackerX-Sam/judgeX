@@ -40,7 +40,7 @@ exports.runCode = void 0;
 const dockerode_1 = __importDefault(require("dockerode"));
 const tar = __importStar(require("tar-stream"));
 const docker = new dockerode_1.default();
-const runCode = async (language, code, input) => {
+const runCode = async (language, code, input, isPlayground = false) => {
     let image = '';
     let cmd = [];
     let fileName = '';
@@ -48,13 +48,38 @@ const runCode = async (language, code, input) => {
         case 'python':
             image = 'python:3.9-alpine';
             fileName = 'main.py';
-            cmd = ['sh', '-c', `python /app/main.py < /app/input.txt`];
+            cmd = ['sh', '-c', `python /main.py < /input.txt`];
+            break;
+        case 'c':
+            image = 'frolvlad/alpine-gxx';
+            fileName = 'main.c';
+            cmd = ['sh', '-c', `gcc /main.c -o /main && /main < /input.txt`];
+            break;
+        case 'cpp':
+            image = 'frolvlad/alpine-gxx'; // Lightweight image with g++
+            fileName = 'main.cpp';
+            cmd = ['sh', '-c', `g++ /main.cpp -o /main && /main < /input.txt`];
+            break;
+        case 'go':
+            image = 'golang:1.20-alpine';
+            fileName = 'main.go';
+            cmd = ['sh', '-c', `go run /main.go < /input.txt`];
+            break;
+        case 'rust':
+            image = 'rust:1.70-alpine';
+            fileName = 'main.rs';
+            cmd = ['sh', '-c', `rustc /main.rs -o /main && /main < /input.txt`];
+            break;
+        case 'java':
+            image = 'openjdk:11-jdk-slim';
+            fileName = 'Main.java';
+            cmd = ['sh', '-c', `javac /Main.java && java -cp / Main < /input.txt`];
             break;
         case 'javascript':
         case 'typescript':
             image = 'node:18-alpine';
             fileName = 'main.js';
-            cmd = ['sh', '-c', `node /app/main.js < /app/input.txt`];
+            cmd = ['sh', '-c', `node /main.js < /input.txt`];
             break;
         default:
             return { error: `Unsupported language: ${language}`, output: '' };
@@ -80,6 +105,11 @@ const runCode = async (language, code, input) => {
             HostConfig: {
                 AutoRemove: true,
                 Memory: 256 * 1024 * 1024, // 256MB limit
+                CpuPeriod: 100000,
+                CpuQuota: 100000, // 1 CPU Core
+                PidsLimit: 64, // Prevent fork bombs
+                CapDrop: ['ALL'], // Drop all root capabilities
+                SecurityOpt: ['no-new-privileges'], // Prevent privilege escalation
                 NetworkMode: 'none', // completely isolated from network
             }
         });
@@ -88,8 +118,8 @@ const runCode = async (language, code, input) => {
         pack.entry({ name: fileName }, code);
         pack.entry({ name: 'input.txt' }, input);
         pack.finalize();
-        // Extract archive to /app in the container
-        await container.putArchive(pack, { path: '/app' });
+        // Extract archive to / in the container
+        await container.putArchive(pack, { path: '/' });
         // Start execution
         await container.start();
         // Wait for container to finish or timeout (5 seconds)

@@ -3,18 +3,19 @@
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-top: 2rem;
+  padding: 1rem;
+  margin-top: 1rem;
   color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  width: fit-content;
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .activity-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -23,7 +24,7 @@
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: repeat(7, 1fr);
-  gap: 4px;
+  gap: 3px;
   overflow-x: auto;
   padding-bottom: 0.5rem;
 }
@@ -37,9 +38,9 @@
 }
 
 .activity-square {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
   background-color: #1e293b;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   cursor: pointer;
@@ -61,7 +62,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #94a3b8;
   align-self: flex-end;
 }

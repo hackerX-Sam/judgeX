@@ -65,12 +65,26 @@ const worker = new Worker('submissionQueue', async (job: Job) => {
     }
 
     // 3. Update the submission status in the backend
-    await axios.put(`http://localhost:3000/api/submissions/${submissionId}`, {
-      status: finalStatus,
-      errorMessage,
-      runtime: maxRuntime,
-      memory: 0 // Mock memory for now
-    });
+    if (job.data.isVerification) {
+      const { originalSubmissionId } = job.data;
+      await axios.put(`http://localhost:3000/api/submissions/${originalSubmissionId}/intelligence`, {
+        improvementStatus: finalStatus === 'ACCEPTED' ? 'VERIFIED_IMPROVEMENT' : 'FAILED_VERIFICATION'
+      });
+    } else {
+      await axios.put(`http://localhost:3000/api/submissions/${submissionId}`, {
+        status: finalStatus,
+        errorMessage,
+        runtime: maxRuntime,
+        memory: 0 // Mock memory for now
+      });
+      
+      // Trigger AI analysis if it was a normal submission
+      try {
+        await axios.post(`http://localhost:3000/api/submissions/${submissionId}/analyze`);
+      } catch (e: any) {
+        console.error('Failed to trigger AI analysis:', e.message);
+      }
+    }
 
     console.log(`[Job ${job.id}] Completed with status: ${finalStatus}`);
 

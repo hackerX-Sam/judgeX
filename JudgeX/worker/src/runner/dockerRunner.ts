@@ -69,6 +69,11 @@ export const runCode = async (language: string, code: string, input: string, isP
       HostConfig: {
         AutoRemove: true,
         Memory: 256 * 1024 * 1024, // 256MB limit
+        CpuPeriod: 100000,
+        CpuQuota: 100000, // 1 CPU Core
+        PidsLimit: 64, // Prevent fork bombs
+        CapDrop: ['ALL'], // Drop all root capabilities
+        SecurityOpt: ['no-new-privileges'], // Prevent privilege escalation
         NetworkMode: 'none', // completely isolated from network
       }
     });

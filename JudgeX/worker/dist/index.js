@@ -46,8 +46,14 @@ const redisConnection = {
     port: 6379,
 };
 const worker = new bullmq_1.Worker('submissionQueue', async (job) => {
-    const { submissionId, problemId, code, language } = job.data;
-    console.log(`\n[Job ${job.id}] Processing submission ${submissionId} for problem ${problemId} in ${language}`);
+    const { submissionId, problemId, code, language, input } = job.data;
+    console.log(`\n[Job ${job.id}] Processing submission ${submissionId || 'playground'} for problem ${problemId} in ${language}`);
+    if (problemId === 'playground') {
+        const startTime = Date.now();
+        const result = await (0, dockerRunner_1.runCode)(language, code, input || '', true);
+        const runtime = Date.now() - startTime;
+        return { ...result, runtime };
+    }
     try {
         // 1. Fetch all test cases from the backend API
         const response = await axios_1.default.get(`http://localhost:3000/api/problems/${problemId}/testcases/all`);
@@ -84,12 +90,27 @@ const worker = new bullmq_1.Worker('submissionQueue', async (job) => {
             }
         }
         // 3. Update the submission status in the backend
-        await axios_1.default.put(`http://localhost:3000/api/submissions/${submissionId}`, {
-            status: finalStatus,
-            errorMessage,
-            runtime: maxRuntime,
-            memory: 0 // Mock memory for now
-        });
+        if (job.data.isVerification) {
+            const { originalSubmissionId } = job.data;
+            await axios_1.default.put(`http://localhost:3000/api/submissions/${originalSubmissionId}/intelligence`, {
+                improvementStatus: finalStatus === 'ACCEPTED' ? 'VERIFIED_IMPROVEMENT' : 'FAILED_VERIFICATION'
+            });
+        }
+        else {
+            await axios_1.default.put(`http://localhost:3000/api/submissions/${submissionId}`, {
+                status: finalStatus,
+                errorMessage,
+                runtime: maxRuntime,
+                memory: 0 // Mock memory for now
+            });
+            // Trigger AI analysis if it was a normal submission
+            try {
+                await axios_1.default.post(`http://localhost:3000/api/submissions/${submissionId}/analyze`);
+            }
+            catch (e) {
+                console.error('Failed to trigger AI analysis:', e.message);
+            }
+        }
         console.log(`[Job ${job.id}] Completed with status: ${finalStatus}`);
     }
     catch (error) {

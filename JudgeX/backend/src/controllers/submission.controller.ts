@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { submissionQueue, queueEvents } from '../queue/submission.queue';
+import { intelligenceQueue } from '../queue/intelligence.queue';
 
 const prisma = new PrismaClient();
 
@@ -88,6 +89,7 @@ export const getSubmission = async (req: Request, res: Response): Promise<any> =
     const id = req.params.id as string;
     const submission = await prisma.submission.findUnique({
       where: { id },
+      include: { intelligence: true }
     });
 
     if (!submission) {
@@ -177,6 +179,43 @@ export const getSolvedProblems = async (req: Request, res: Response): Promise<an
     res.status(200).json({ solvedProblemIds });
   } catch (error) {
     console.error('Error fetching solved problems:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const analyzeSubmission = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const id = req.params.id as string;
+    await intelligenceQueue.add('analyze', { action: 'analyze', submissionId: id });
+    res.status(202).json({ message: 'Analysis queued' });
+  } catch (error) {
+    console.error('Error queuing analysis:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const improveSubmission = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const id = req.params.id as string;
+    await intelligenceQueue.add('improve', { action: 'improve', submissionId: id });
+    res.status(202).json({ message: 'Improvement queued' });
+  } catch (error) {
+    console.error('Error queuing improvement:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const updateIntelligenceStatus = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const id = req.params.id as string;
+    const { improvementStatus } = req.body;
+    const int = await prisma.codeIntelligence.update({
+      where: { submissionId: id },
+      data: { improvementStatus }
+    });
+    res.status(200).json({ intelligence: int });
+  } catch (error) {
+    console.error('Error updating intelligence status:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

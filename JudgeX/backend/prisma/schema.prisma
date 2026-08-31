@@ -66,4 +66,25 @@ model Submission {
   memoryUsed    Int?     // in megabytes
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  intelligence  CodeIntelligence?
+}
+
+model CodeIntelligence {
+  id               String     @id @default(uuid())
+  submissionId     String     @unique
+  submission       Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  
+  timeComplexity   String
+  spaceComplexity  String
+  qualityScore     Int
+  readabilityScore Int
+  codeSmells       String     // JSON array string
+  edgeCases        String     // JSON array string
+  explanation      String
+  optimization     String
+  
+  improvedCode     String?
+  improvementStatus String    @default("PENDING") // PENDING, VERIFIED_IMPROVEMENT, FAILED_VERIFICATION
+  
+  createdAt        DateTime   @default(now())
 }

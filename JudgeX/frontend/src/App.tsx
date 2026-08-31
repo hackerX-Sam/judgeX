@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
 import { setCredentials } from './store/slices/authSlice';
 import axios from 'axios';
-import { CheckCircle2, Circle, Lock, ChevronRight, Search, Library, Target, Compass, GraduationCap, UserCircle2, Star, Clock, Play, Sun, Moon, Terminal } from 'lucide-react';
+import { CheckCircle2, Circle, Lock, ChevronRight, Search, Library, Target, Compass, GraduationCap, UserCircle2, Star, Clock, Play, Terminal } from 'lucide-react';
 import './index.css';
 import './App.css';
 import RegisterPage from './pages/RegisterPage';
@@ -245,7 +245,6 @@ const Welcome = () => {
   const [activeProblem, setActiveProblem] = useState('binary-search');
   const [activeLang, setActiveLang] = useState('Java');
   const [runState, setRunState] = useState<'idle' | 'running' | 'finished'>('idle');
-  const user = useSelector((state: any) => state.auth.user);
 
   const handleRun = () => {
     if (runState === 'running') return;
