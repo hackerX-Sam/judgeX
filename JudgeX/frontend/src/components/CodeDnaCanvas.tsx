@@ -279,13 +279,13 @@ export const CodeDnaCanvas: React.FC = () => {
       currentMouseY += (targetMouseY - currentMouseY) * 0.05;
 
       if (!prefersReducedMotion) {
-        // Ultra-Serene 3D DNA Slow Motion
-        dnaGroup.rotation.y = elapsedTime * 0.025 + currentScroll * Math.PI * 1.2;
-        dnaGroup.rotation.x = Math.sin(elapsedTime * 0.1) * 0.05 + currentMouseY * 0.2;
-        dnaGroup.rotation.z = currentMouseX * 0.1;
+        // Ultra-Serene 3D DNA Slow Motion with Responsive Cursor Tilt
+        dnaGroup.rotation.y = elapsedTime * 0.025 + currentScroll * Math.PI * 1.2 + currentMouseX * 0.45;
+        dnaGroup.rotation.x = Math.sin(elapsedTime * 0.1) * 0.05 + currentMouseY * 0.35;
+        dnaGroup.rotation.z = currentMouseX * 0.55; // Pronounced left/right tilt
 
         dnaGroup.position.y = Math.sin(elapsedTime * 0.3) * 0.2 + (currentScroll - 0.5) * 2.5;
-        dnaGroup.position.x = Math.cos(elapsedTime * 0.2) * 0.1;
+        dnaGroup.position.x = Math.cos(elapsedTime * 0.2) * 0.1 + currentMouseX * 0.8; // Gentle follow offset
 
         // Flow code and binary numbers INSIDE the glass tubes (Ultra Slow Motion)
         for (let i = 0; i < codeSprites.length; i++) {
