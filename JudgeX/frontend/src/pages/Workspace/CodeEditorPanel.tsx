@@ -64,7 +64,7 @@ export default function CodeEditorPanel({ problem }: Props) {
               setShowDiff(true);
             }
           }
-        } catch(_e) {
+        } catch {
           clearInterval(interval);
           setIsImproving(false);
         }
@@ -147,7 +147,7 @@ export default function CodeEditorPanel({ problem }: Props) {
           setIntelligence(intl);
           setIsAnalyzing(false);
         }
-      } catch (_e) {
+      } catch {
         clearInterval(aiInterval);
         setIsAnalyzing(false);
       }

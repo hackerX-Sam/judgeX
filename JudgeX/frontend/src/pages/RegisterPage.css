@@ -35,18 +35,21 @@
 }
 
 .register-logo-img {
-  height: 60px;
+  height: 44px;
+  width: auto;
   object-fit: contain;
+  filter: brightness(1.1) drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+  transition: transform 0.2s ease;
 }
 
-.dark .register-logo-img {
-  filter: invert(1) hue-rotate(180deg) brightness(1.2);
+.register-logo-img:hover {
+  transform: scale(1.05);
 }
 
 .register-logo-link .logo-text {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #ffffff;
   letter-spacing: -0.5px;
 }
 

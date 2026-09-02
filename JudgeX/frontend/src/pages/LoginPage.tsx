@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Eye, EyeOff } from 'lucide-react';
@@ -16,6 +16,16 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const errParam = searchParams.get('error');
+    if (errParam) {
+      setError(decodeURIComponent(errParam));
+      // Clean query string
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -75,7 +85,7 @@ const LoginPage: React.FC = () => {
           <div className="form-section" style={{ border: 'none', padding: 0 }}>
             <div className="input-group">
               <label htmlFor="email">Email Address</label>
-              <input type="email" id="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" required />
+              <input type="email" id="email" value={formData.email} onChange={handleChange} placeholder="samiran@example.com" required />
             </div>
 
             <div className="input-group password-group">

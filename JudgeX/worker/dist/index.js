@@ -41,6 +41,7 @@ const dockerRunner_1 = require("./runner/dockerRunner");
 const axios_1 = __importDefault(require("axios"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
 const redisConnection = {
     host: '127.0.0.1',
     port: 6379,
@@ -56,7 +57,7 @@ const worker = new bullmq_1.Worker('submissionQueue', async (job) => {
     }
     try {
         // 1. Fetch all test cases from the backend API
-        const response = await axios_1.default.get(`http://localhost:3000/api/problems/${problemId}/testcases/all`);
+        const response = await axios_1.default.get(`${BACKEND_URL}/api/problems/${problemId}/testcases/all`);
         const testCases = response.data.testCases;
         if (!testCases || testCases.length === 0) {
             throw new Error('No test cases found for this problem.');
@@ -92,12 +93,12 @@ const worker = new bullmq_1.Worker('submissionQueue', async (job) => {
         // 3. Update the submission status in the backend
         if (job.data.isVerification) {
             const { originalSubmissionId } = job.data;
-            await axios_1.default.put(`http://localhost:3000/api/submissions/${originalSubmissionId}/intelligence`, {
+            await axios_1.default.put(`${BACKEND_URL}/api/submissions/${originalSubmissionId}/intelligence`, {
                 improvementStatus: finalStatus === 'ACCEPTED' ? 'VERIFIED_IMPROVEMENT' : 'FAILED_VERIFICATION'
             });
         }
         else {
-            await axios_1.default.put(`http://localhost:3000/api/submissions/${submissionId}`, {
+            await axios_1.default.put(`${BACKEND_URL}/api/submissions/${submissionId}`, {
                 status: finalStatus,
                 errorMessage,
                 runtime: maxRuntime,
@@ -105,7 +106,7 @@ const worker = new bullmq_1.Worker('submissionQueue', async (job) => {
             });
             // Trigger AI analysis if it was a normal submission
             try {
-                await axios_1.default.post(`http://localhost:3000/api/submissions/${submissionId}/analyze`);
+                await axios_1.default.post(`${BACKEND_URL}/api/submissions/${submissionId}/analyze`);
             }
             catch (e) {
                 console.error('Failed to trigger AI analysis:', e.message);
@@ -115,7 +116,7 @@ const worker = new bullmq_1.Worker('submissionQueue', async (job) => {
     }
     catch (error) {
         console.error(`[Job ${job.id}] Error:`, error.message);
-        await axios_1.default.put(`http://localhost:3000/api/submissions/${submissionId}`, {
+        await axios_1.default.put(`${BACKEND_URL}/api/submissions/${submissionId}`, {
             status: 'RUNTIME_ERROR',
             errorMessage: 'Internal worker error: ' + error.message
         }).catch(e => console.error('Failed to report error to backend:', e.message));

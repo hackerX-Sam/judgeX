@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Eye, EyeOff } from 'lucide-react';
@@ -27,6 +27,15 @@ const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const errParam = searchParams.get('error');
+    if (errParam) {
+      setError(decodeURIComponent(errParam));
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type, checked } = e.target;
@@ -92,17 +101,17 @@ const RegisterPage: React.FC = () => {
             <h3>Basic Information</h3>
             <div className="input-group">
               <label htmlFor="fullName">Full Name</label>
-              <input type="text" id="fullName" value={formData.fullName} onChange={handleChange} placeholder="John Doe" required />
+              <input type="text" id="fullName" value={formData.fullName} onChange={handleChange} placeholder="Samiran Das" required />
             </div>
             
             <div className="input-group">
               <label htmlFor="username">Username (must be unique)</label>
-              <input type="text" id="username" value={formData.username} onChange={handleChange} placeholder="johndoe123" required />
+              <input type="text" id="username" value={formData.username} onChange={handleChange} placeholder="samirandas" required />
             </div>
 
             <div className="input-group">
               <label htmlFor="email">Email Address</label>
-              <input type="email" id="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" required />
+              <input type="email" id="email" value={formData.email} onChange={handleChange} placeholder="samiran@example.com" required />
             </div>
 
             <div className="input-row">

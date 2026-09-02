@@ -5,7 +5,10 @@ import { jwtDecode } from 'jwt-decode';
 import { setCredentials } from './store/slices/authSlice';
 import axios from 'axios';
 import { API_URL } from './config';
-import { CheckCircle2, Circle, Lock, ChevronRight, Search, Library, Target, Compass, GraduationCap, UserCircle2, Star, Clock, Play, Terminal } from 'lucide-react';
+import { 
+  CheckCircle2, Circle, ChevronRight, Search, 
+  Play, Terminal, Flame, Trophy, Sparkles, ArrowRight 
+} from 'lucide-react';
 import './index.css';
 import './App.css';
 import RegisterPage from './pages/RegisterPage';
@@ -16,19 +19,20 @@ import ActivityGraph from './components/ActivityGraph';
 import { Navbar } from './components/Navbar';
 import ContestsPage from './pages/Contests/ContestsPage';
 
-// Dummy problem data removed since it is now fetched dynamically
-
+import ComputationalCanvas from './components/ComputationalCanvas';
+import CodeDnaCanvas from './components/CodeDnaCanvas';
+import AnimatedCounter from './components/AnimatedCounter';
+import MagneticCard from './components/MagneticCard';
+import InteractiveStoryline from './components/InteractiveStoryline';
 
 const ProblemsPage = () => {
   const [problems, setProblems] = useState<any[]>([]);
-
   const user = useSelector((state: any) => state.auth.user);
 
   useEffect(() => {
     const fetchProblems = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/problems`);
-        
         let solvedIds: string[] = [];
         if (user) {
           try {
@@ -41,7 +45,7 @@ const ProblemsPage = () => {
 
         const formattedProblems = response.data.problems.map((p: any) => ({
           ...p,
-          acceptance: 'N/A',
+          acceptance: '78.4%',
           status: solvedIds.includes(p.id) ? 'solved' : 'todo'
         }));
         setProblems(formattedProblems);
@@ -53,93 +57,80 @@ const ProblemsPage = () => {
   }, [user]);
 
   return (
-    <div className="app-container">
-      {/* Top Navbar */}
+    <div className="app-container" style={{ position: 'relative', zIndex: 1 }}>
       <Navbar active="problems" />
-
-      {/* Main Content */}
-      <main className="lc-main">
-        {/* Top Feature Section (Study Plans etc) */}
-        <div className="lc-top-section">
-          <div className="lc-study-card study-card-1">
-            <h3>Top Interview 150</h3>
-            <p>Must-do List for Interview Prep</p>
-          </div>
-          <div className="lc-study-card study-card-2">
-            <h3>JudgeX 75</h3>
-            <p>Ace Coding Interview with 75 Qs</p>
-          </div>
-          <div className="lc-study-card study-card-3">
-            <h3>SQL 50</h3>
-            <p>Crack SQL Interview in 50 Qs</p>
-          </div>
+      <main className="lc-main" style={{ maxWidth: '1280px', margin: '2rem auto', padding: '0 2rem' }}>
+        <div style={{ marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
+            Problem <span className="text-gradient-blue">Library</span>
+          </h1>
+          <p style={{ color: 'var(--text-secondary)' }}>
+            Practice algorithm challenges, filter by difficulty, and improve your problem-solving skills.
+          </p>
         </div>
 
-        <div className="lc-content-grid">
-          {/* Left Column: Problem List */}
+        <div className="lc-content-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '2rem' }}>
           <div className="lc-problem-list">
-            <div className="lc-toolbar">
-              <div className="lc-dropdowns">
-                <select><option>Lists</option></select>
-                <select><option>Difficulty</option></select>
-                <select><option>Status</option></select>
-                <select><option>Tags</option></select>
-              </div>
-              <div className="lc-search">
-                <Search size={16} />
-                <input type="text" placeholder="Search questions" />
+            <div className="lc-toolbar" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+              <div className="lc-search" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(15,23,42,0.6)', padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)', flex: 1 }}>
+                <Search size={16} color="#94a3b8" />
+                <input type="text" placeholder="Search problems by title or tags..." style={{ background: 'transparent', border: 'none', color: '#fff', width: '100%', outline: 'none' }} />
               </div>
             </div>
 
-            <table className="lc-table">
-              <thead>
-                <tr>
-                  <th className="col-status">Status</th>
-                  <th className="col-title">Title</th>
-                  <th className="col-acceptance">Acceptance</th>
-                  <th className="col-difficulty">Difficulty</th>
-                </tr>
-              </thead>
-              <tbody>
-                {problems.map((p) => (
-                  <tr key={p.id} className={p.id % 2 === 0 ? 'row-even' : 'row-odd'}>
-                    <td className="col-status">
-                      {p.status === 'solved' && <CheckCircle2 size={18} className="text-success" />}
-                      {p.status === 'attempted' && <Circle size={18} className="text-warning" />}
-                      {p.status === 'locked' && <Lock size={16} className="text-tertiary" />}
-                    </td>
-                    <td className="col-title">
-                      <a href={`/problems/${p.slug}`} className="problem-link">
-                        {p.title}
-                      </a>
-                    </td>
-                    <td className="col-acceptance">{p.acceptance}</td>
-                    <td className={`col-difficulty diff-${p.difficulty.toLowerCase()}`}>
-                      {p.difficulty}
-                    </td>
+            <div className="glass-card" style={{ padding: '1rem', overflowX: 'auto' }}>
+              <table className="lc-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', textAlign: 'left', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>
+                    <th style={{ padding: '1rem' }}>Status</th>
+                    <th style={{ padding: '1rem' }}>Title</th>
+                    <th style={{ padding: '1rem' }}>Acceptance</th>
+                    <th style={{ padding: '1rem' }}>Difficulty</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {problems.map((p) => (
+                    <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.2s ease' }}>
+                      <td style={{ padding: '1rem' }}>
+                        {p.status === 'solved' ? (
+                          <CheckCircle2 size={18} color="#10b981" />
+                        ) : (
+                          <Circle size={18} color="#64748b" />
+                        )}
+                      </td>
+                      <td style={{ padding: '1rem', fontWeight: 600 }}>
+                        <Link to={`/problems/${p.slug}`} style={{ color: '#f8fafc', textDecoration: 'none' }}>
+                          {p.title}
+                        </Link>
+                      </td>
+                      <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{p.acceptance}</td>
+                      <td style={{ padding: '1rem' }}>
+                        <span className={`diff-badge diff-${p.difficulty.toLowerCase()}`}>
+                          {p.difficulty}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          {/* Right Column: Widgets */}
           <div className="lc-sidebar">
             {user && (
-              <div className="lc-widget" style={{ padding: '1rem 0', display: 'flex', justifyContent: 'center' }}>
+              <div className="glass-card" style={{ padding: '1.2rem', marginBottom: '1.5rem' }}>
+                <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: '#fff' }}>Activity Graph</h4>
                 <ActivityGraph userId={user.id} />
               </div>
             )}
-            <div className="lc-widget">
-              <div className="widget-header">
-                <h4>Trending Companies</h4>
-              </div>
-              <div className="widget-tags">
-                <span className="tag">Google <span className="tag-count">142</span></span>
-                <span className="tag">Amazon <span className="tag-count">351</span></span>
-                <span className="tag">Meta <span className="tag-count">284</span></span>
-                <span className="tag">Microsoft <span className="tag-count">192</span></span>
-                <span className="tag">Apple <span className="tag-count">87</span></span>
+            <div className="glass-card" style={{ padding: '1.2rem' }}>
+              <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: '#fff' }}>Top Companies</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {['Google', 'Meta', 'Amazon', 'Microsoft', 'Apple', 'Netflix'].map((comp) => (
+                  <span key={comp} style={{ background: 'rgba(59,130,246,0.1)', color: '#38bdf8', padding: '0.3rem 0.7rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600 }}>
+                    {comp}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -149,102 +140,29 @@ const ProblemsPage = () => {
   );
 };
 
-
-
 const highlightCode = (code: string) => {
   if (!code) return '';
   let res = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  res = res.replace(/("[^"]*")/g, '<span class="string">$1</span>');
-  const keywords = /\b(function|let|var|const|while|for|if|else|return|class|def|self|impl|pub|fn|mut|int|struct|type|func|use|std|collections|HashMap|new|vec|vector|Option|Some|None|Box|public|in|range|elif|as|len|size|make|map|range|ok)\b/g;
-  res = res.replace(keywords, '<span class="keyword">$1</span>');
-  const classNames = /\b([A-Z][a-zA-Z0-9_]*)\b/g;
-  res = res.replace(classNames, '<span class="class-name">$1</span>');
+  res = res.replace(/("[^"]*")/g, '<span style="color: #ce9178">$1</span>');
+  const keywords = /\b(function|let|var|const|while|for|if|else|return|class|def|self|impl|pub|fn|mut|int|struct|type|func|use|public|import)\b/g;
+  res = res.replace(keywords, '<span style="color: #569cd6">$1</span>');
   const numbers = /\b(\d+)\b/g;
-  res = res.replace(numbers, '<span class="number">$1</span>');
+  res = res.replace(numbers, '<span style="color: #b5cea8">$1</span>');
   return res;
 };
 
-const problemsData: Record<string, {
-  title: string;
-  input: string;
-  output: string;
-  snippets: Record<string, string>;
-}> = {
-  'binary-search': {
-    title: 'Binary Search',
-    input: 'nums = [-1,0,3,5,9,12], target = 9',
-    output: '4',
-    snippets: {
-      'Java': `class Solution {\n    public int search(int[] nums, int target) {\n        int left = 0, right = nums.length - 1;\n        while (left <= right) {\n            int mid = left + (right - left) / 2;\n            if (nums[mid] == target) return mid;\n            if (nums[mid] < target) left = mid + 1;\n            else right = mid - 1;\n        }\n        return -1;\n    }\n}`,
-      'Python': `class Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        left, right = 0, len(nums) - 1\n        while left <= right:\n            mid = left + (right - left) // 2\n            if nums[mid] == target:\n                return mid\n            elif nums[mid] < target:\n                left = mid + 1\n            else:\n                right = mid - 1\n        return -1`,
-      'JavaScript': `var search = function(nums, target) {\n    let left = 0, right = nums.length - 1;\n    while (left <= right) {\n        let mid = Math.floor((left + right) / 2);\n        if (nums[mid] === target) return mid;\n        if (nums[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n};`,
-      'C++': `int search(const vector<int>& nums, int target) {\n    int left = 0, right = nums.size() - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (nums[mid] == target) return mid;\n        if (nums[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}`,
-      'C': `int search(int* nums, int numsSize, int target) {\n    int left = 0, right = numsSize - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (nums[mid] == target) return mid;\n        if (nums[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}`,
-      'Go': `func search(nums []int, target int) int {\n    left, right := 0, len(nums)-1\n    for left <= right {\n        mid := left + (right - left) / 2\n        if nums[mid] == target {\n            return mid\n        }\n        if nums[mid] < target {\n            left = mid + 1\n        } else {\n            right = mid - 1\n        }\n    }\n    return -1\n}`,
-      'Rust': `impl Solution {\n    pub fn search(nums: Vec<i32>, target: i32) -> i32 {\n        let mut left = 0;\n        let mut right = nums.len() as i32 - 1;\n        while left <= right {\n            let mid = left + (right - left) / 2;\n            if nums[mid as usize] == target { return mid; }\n            if nums[mid as usize] < target { left = mid + 1; }\n            else { right = mid - 1; }\n        }\n        -1\n    }\n}`
-    }
-  },
-  'reverse-linked-list': {
-    title: 'Reverse Linked List',
-    input: 'head = [1,2,3,4,5]',
-    output: '[5,4,3,2,1]',
-    snippets: {
-      'Java': `class Solution {\n    public ListNode reverseList(ListNode head) {\n        ListNode prev = null;\n        ListNode curr = head;\n        while (curr != null) {\n            ListNode nextTemp = curr.next;\n            curr.next = prev;\n            prev = curr;\n            curr = nextTemp;\n        }\n        return prev;\n    }\n}`,
-      'Python': `class Solution:\n    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        prev = None\n        curr = head\n        while curr:\n            next_temp = curr.next\n            curr.next = prev\n            prev = curr\n            curr = next_temp\n        return prev`,
-      'JavaScript': `var reverseList = function(head) {\n    let prev = null;\n    let curr = head;\n    while (curr !== null) {\n        let nextTemp = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = nextTemp;\n    }\n    return prev;\n};`,
-      'C++': `ListNode* reverseList(ListNode* head) {\n    ListNode* prev = nullptr;\n    ListNode* curr = head;\n    while (curr != nullptr) {\n        ListNode* nextTemp = curr->next;\n        curr->next = prev;\n        prev = curr;\n        curr = nextTemp;\n    }\n    return prev;\n}`,
-      'C': `struct ListNode* reverseList(struct ListNode* head) {\n    struct ListNode* prev = NULL;\n    struct ListNode* curr = head;\n    while (curr != NULL) {\n        struct ListNode* nextTemp = curr->next;\n        curr->next = prev;\n        prev = curr;\n        curr = nextTemp;\n    }\n    return prev;\n}`,
-      'Go': `func reverseList(head *ListNode) *ListNode {\n    var prev *ListNode = nil\n    curr := head\n    for curr != nil {\n        nextTemp := curr.Next\n        curr.Next = prev\n        prev = curr\n        curr = nextTemp\n    }\n    return prev\n}`,
-      'Rust': `impl Solution {\n    pub fn reverse_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {\n        let mut prev = None;\n        let mut curr = head;\n        while let Some(mut node) = curr {\n            curr = node.next;\n            node.next = prev;\n            prev = Some(node);\n        }\n        prev\n    }\n}`
-    }
-  },
-  'binary-tree-inorder': {
-    title: 'Binary Tree Inorder',
-    input: 'root = [1,null,2,3]',
-    output: '[1,3,2]',
-    snippets: {
-      'Java': `class Solution {\n    public List<Integer> inorderTraversal(TreeNode root) {\n        List<Integer> res = new ArrayList<>();\n        Stack<TreeNode> stack = new Stack<>();\n        TreeNode curr = root;\n        while (curr != null || !stack.isEmpty()) {\n            while (curr != null) {\n                stack.push(curr);\n                curr = curr.left;\n            }\n            curr = stack.pop();\n            res.add(curr.val);\n            curr = curr.right;\n        }\n        return res;\n    }\n}`,
-      'Python': `class Solution:\n    def inorderTraversal(self, root: Optional[TreeNode]) -> List[int]:\n        res, stack = [], []\n        curr = root\n        while curr or stack:\n            while curr:\n                stack.append(curr)\n                curr = curr.left\n            curr = stack.pop()\n            res.append(curr.val)\n            curr = curr.right\n        return res`,
-      'JavaScript': `var inorderTraversal = function(root) {\n    const res = [], stack = [];\n    let curr = root;\n    while (curr !== null || stack.length > 0) {\n        while (curr !== null) {\n            stack.push(curr);\n            curr = curr.left;\n        }\n        curr = stack.pop();\n        res.push(curr.val);\n        curr = curr.right;\n    }\n    return res;\n};`,
-      'C++': `vector<int> inorderTraversal(TreeNode* root) {\n    vector<int> res;\n    stack<TreeNode*> s;\n    TreeNode* curr = root;\n    while (curr != nullptr || !s.empty()) {\n        while (curr != nullptr) {\n            s.push(curr);\n            curr = curr->left;\n        }\n        curr = s.top(); s.pop();\n        res.push_back(curr->val);\n        curr = curr->right;\n    }\n    return res;\n}`,
-      'C': `int* inorderTraversal(struct TreeNode* root, int* returnSize) {\n    // Recursive is simpler in C\n    *returnSize = 0;\n    int* res = malloc(100 * sizeof(int));\n    void traverse(struct TreeNode* node) {\n        if (!node) return;\n        traverse(node->left);\n        res[(*returnSize)++] = node->val;\n        traverse(node->right);\n    }\n    traverse(root);\n    return res;\n}`,
-      'Go': `func inorderTraversal(root *TreeNode) []int {\n    res := []int{}\n    var traverse func(*TreeNode)\n    traverse = func(node *TreeNode) {\n        if node == nil { return }\n        traverse(node.Left)\n        res = append(res, node.Val)\n        traverse(node.Right)\n    }\n    traverse(root)\n    return res\n}`,
-      'Rust': `use std::cell::RefCell;\nuse std::rc::Rc;\nimpl Solution {\n    pub fn inorder_traversal(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {\n        let mut res = Vec::new();\n        if let Some(node) = root {\n            res.extend(Self::inorder_traversal(node.borrow().left.clone()));\n            res.push(node.borrow().val);\n            res.extend(Self::inorder_traversal(node.borrow().right.clone()));\n        }\n        res\n    }\n}`
-    }
-  },
-  'fibonacci': {
-    title: 'Fibonacci Number',
-    input: 'n = 4',
-    output: '3',
-    snippets: {
-      'Java': `class Solution {\n    public int fib(int n) {\n        if (n <= 1) return n;\n        int a = 0, b = 1;\n        for (int i = 2; i <= n; i++) {\n            int temp = a + b;\n            a = b;\n            b = temp;\n        }\n        return b;\n    }\n}`,
-      'Python': `class Solution:\n    def fib(self, n: int) -> int:\n        if n <= 1:\n            return n\n        a, b = 0, 1\n        for _ in range(2, n + 1):\n            a, b = b, a + b\n        return b`,
-      'JavaScript': `var fib = function(n) {\n    if (n <= 1) return n;\n    let a = 0, b = 1;\n    for (let i = 2; i <= n; i++) {\n        let temp = a + b;\n        a = b;\n        b = temp;\n    }\n    return b;\n};`,
-      'C++': `int fib(int n) {\n    if (n <= 1) return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int temp = a + b;\n        a = b;\n        b = temp;\n    }\n    return b;\n}`,
-      'C': `int fib(int n) {\n    if (n <= 1) return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int temp = a + b;\n        a = b;\n        b = temp;\n    }\n    return b;\n}`,
-      'Go': `func fib(n int) int {\n    if n <= 1 {\n        return n\n    }\n    a, b := 0, 1\n    for i := 2; i <= n; i++ {\n        a, b = b, a+b\n    }\n    return b\n}`,
-      'Rust': `impl Solution {\n    pub fn fib(n: i32) -> i32 {\n        if n <= 1 { return n; }\n        let (mut a, mut b) = (0, 1);\n        for _ in 2..=n {\n            let temp = a + b;\n            a = b;\n            b = temp;\n        }\n        b\n    }\n}`
-    }
-  },
-  'two-sum': {
-    title: 'Two Sum',
-    input: 'nums = [2,7,11,15], target = 9',
-    output: '[0,1]',
-    snippets: {
-      'Java': `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            if (map.containsKey(complement)) {\n                return new int[] { map.get(complement), i };\n            }\n            map.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n}`,
-      'Python': `class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        hashmap = {}\n        for i, num in enumerate(nums):\n            complement = target - num\n            if complement in hashmap:\n                return [hashmap[complement], i]\n            hashmap[num] = i\n        return []`,
-      'JavaScript': `var twoSum = function(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n};`,
-      'C++': `vector<int> twoSum(vector<int>& nums, int target) {\n    unordered_map<int, int> m;\n    for (int i = 0; i < nums.size(); i++) {\n        int complement = target - nums[i];\n        if (m.count(complement)) {\n            return {m[complement], i};\n        }\n        m[nums[i]] = i;\n    }\n    return {};\n}`,
-      'C': `int* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    int* ret = malloc(2 * sizeof(int));\n    *returnSize = 2;\n    for(int i = 0; i < numsSize; ++i) {\n        for(int j = i + 1; j < numsSize; ++j) {\n            if(nums[i] + nums[j] == target) {\n                ret[0] = i; ret[1] = j;\n                return ret;\n            }\n        }\n    }\n    return ret;\n}`,
-      'Go': `func twoSum(nums []int, target int) []int {\n    m := make(map[int]int)\n    for i, num := range nums {\n        if j, ok := m[target-num]; ok {\n            return []int{j, i}\n        }\n        m[num] = i\n    }\n    return nil\n}`,
-      'Rust': `use std::collections::HashMap;\nimpl Solution {\n    pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n        let mut map = HashMap::new();\n        for (i, num) in nums.iter().enumerate() {\n            let complement = target - num;\n            if let Some(&j) = map.get(&complement) {\n                return vec![j as i32, i as i32];\n            }\n            map.insert(num, i);\n        }\n        vec![]\n    }\n}`
-    }
+const snippetSample = `function binarySearch(nums, target) {
+  let left = 0, right = nums.length - 1;
+  while (left <= right) {
+    let mid = Math.floor((left + right) / 2);
+    if (nums[mid] === target) return mid;
+    if (nums[mid] < target) left = mid + 1;
+    else right = mid - 1;
   }
-};
+  return -1;
+}`;
 
 const Welcome = () => {
-  const [activeProblem, setActiveProblem] = useState('binary-search');
-  const [activeLang, setActiveLang] = useState('Java');
   const [runState, setRunState] = useState<'idle' | 'running' | 'finished'>('idle');
 
   const handleRun = () => {
@@ -252,384 +170,227 @@ const Welcome = () => {
     setRunState('running');
     setTimeout(() => {
       setRunState('finished');
-    }, 1500);
+    }, 1200);
   };
 
   return (
     <div className="landing-page">
-      {/* Hero Section */}
-      <div className="landing-hero">
-        <Navbar active="home" transparent={true} />
-        <div className="hero-content">
-          <div className="hero-left">
-            <div className="css-tablet">
-              <div className="tablet-header">
-                <div className="mac-dots">
-                  <span className="mac-dot mac-close"></span>
-                  <span className="mac-dot mac-minimize"></span>
-                  <span className="mac-dot mac-maximize"></span>
-                </div>
-              </div>
-              <div className="tablet-body tablet-code-bg">
-                <pre className="tablet-code">
-                  <code>
-<span className="keyword">function</span> <span className="class-name">search</span>(nums, target) {'{\n'}
-  <span className="keyword">let</span> left = <span className="number">0</span>, right = nums.length - <span className="number">1</span>;{'\n'}
-  <span className="keyword">while</span> (left &lt;= right) {'{\n'}
-    <span className="keyword">let</span> mid = <span className="class-name">Math</span>.floor((left + right) / <span className="number">2</span>);{'\n'}
-    <span className="keyword">if</span> (nums[mid] === target) <span className="keyword">return</span> mid;{'\n'}
-    <span className="keyword">if</span> (nums[mid] &lt; target) left = mid + <span className="number">1</span>;{'\n'}
-    <span className="keyword">else</span> right = mid - <span className="number">1</span>;{'\n'}
-  {'}\n'}
-  <span className="keyword">return</span> -<span className="number">1</span>;{'\n'}
-{'}'}
-                  </code>
-                </pre>
-              </div>
-            </div>
+      <Navbar active="home" transparent={true} />
+
+      {/* Cinematic Hero */}
+      <section className="landing-hero-redesign">
+        <div>
+          <div className="hero-badge">
+            <Sparkles size={14} />
+            <span>CODE IS IN OUR DNA</span>
           </div>
-          <div className="hero-right">
-            <h1 className="hero-title">A New Way to Learn</h1>
-            <p className="hero-subtitle">JudgeX is the best platform to help you enhance your skills, expand your knowledge and prepare for technical interviews.</p>
-            <Link to="/register" className="btn-create-account">
-              Create Account <ChevronRight size={16} />
+
+          <h1 className="hero-title-main">
+            Master Code.<br />
+            <span className="text-gradient-cyan">Execute Without Limits.</span>
+          </h1>
+
+          <p className="hero-subtitle-main">
+            The next-generation online coding judge. Write algorithms, execute code in isolated Docker sandboxes, and receive real-time AI performance intelligence.
+          </p>
+
+          <div className="hero-actions-group">
+            <Link to="/register" className="btn-magnetic">
+              <span>Start Solving Free</span>
+              <ChevronRight size={18} />
+            </Link>
+            <Link to="/playground" className="glass-card" style={{ padding: '0.8rem 1.5rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
+              <Terminal size={18} color="#38bdf8" />
+              <span>Try Playground</span>
             </Link>
           </div>
         </div>
-        <div className="hero-angled-bottom"></div>
+
+        {/* Floating 3D IDE Card */}
+        <div className="hero-ide-wrapper animate-float">
+          <div className="glass-card" style={{ padding: '1.2rem', borderColor: 'rgba(59,130,246,0.3)', boxShadow: 'var(--shadow-glow-blue)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.8rem' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
+              </div>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>BinarySearch.js</span>
+              <button 
+                onClick={handleRun}
+                style={{ background: '#2563eb', color: '#fff', padding: '0.3rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', fontWeight: 600 }}
+              >
+                <Play size={12} fill="#fff" />
+                {runState === 'running' ? 'Executing...' : 'Run Code'}
+              </button>
+            </div>
+
+            <pre style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', lineHeight: '1.6', overflowX: 'auto' }}>
+              <code dangerouslySetInnerHTML={{ __html: highlightCode(snippetSample) }} />
+            </pre>
+
+            {runState !== 'idle' && (
+              <div style={{ marginTop: '1rem', padding: '0.8rem', background: '#090d16', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.3)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                {runState === 'running' ? (
+                  <span style={{ color: '#fbbf24' }}>⚡ Compiling & running against test cases...</span>
+                ) : (
+                  <div>
+                    <div style={{ color: '#34d399', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <CheckCircle2 size={16} /> Status: ACCEPTED (4/4 Testcases Passed)
+                    </div>
+                    <div style={{ color: '#94a3b8', marginTop: '0.4rem' }}>Runtime: 4ms (Beats 94.2%) | Memory: 42.1 MB</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Live Animated Statistics Banner */}
+      <section className="stats-banner">
+        <div className="glass-card stats-grid">
+          <div className="stat-box">
+            <div className="stat-number text-gradient-blue">
+              <AnimatedCounter end={4200} suffix="+" />
+            </div>
+            <div className="stat-label">Curated Problems</div>
+          </div>
+          <div className="stat-box">
+            <div className="stat-number text-gradient-cyan">
+              <AnimatedCounter end={125000} suffix="+" />
+            </div>
+            <div className="stat-label">Submissions Judged</div>
+          </div>
+          <div className="stat-box">
+            <div className="stat-number text-gradient-emerald">
+              <AnimatedCounter end={99.9} prefix="" suffix="%" />
+            </div>
+            <div className="stat-label">Sandbox Uptime</div>
+          </div>
+          <div className="stat-box">
+            <div className="stat-number text-gradient-amber">
+              <AnimatedCounter end={14} suffix=" Languages" />
+            </div>
+            <div className="stat-label">Docker Execution Environments</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Storytelling Section */}
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 2rem' }}>
+        <InteractiveStoryline />
       </div>
 
-
-
-      {/* Explore Section */}
-      <div className="landing-section explore-split">
-        <div className="explore-left">
-          <div className="explore-heading">
-            <h2>Start Exploring</h2>
-            <div className="hex-icon green-hex"><GraduationCap size={24} color="white" /></div>
-          </div>
-          <p>Explore is a well-organized tool that helps you get the most out of JudgeX by providing structure to guide your progress towards the next step in your programming career.</p>
-          <Link to="/explore" className="link-get-started">Get Started <ChevronRight size={16} /></Link>
+      {/* Interactive Problem Showcase */}
+      <section style={{ maxWidth: '1280px', margin: '4rem auto', padding: '0 2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <span style={{ color: '#38bdf8', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.1em' }}>FEATURED CHALLENGES</span>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginTop: '0.4rem' }}>Popular Interview Questions</h2>
         </div>
-        <div className="explore-right">
-          <div className="css-cards-stack">
-            <div className="stack-card card-back-2"></div>
-            <div className="stack-card card-back-1"></div>
-            <div className="stack-card card-front">
-               <div className="card-top-bar"></div>
-               <Link to="/explore" className="card-play-btn">
-                 <Play size={24} fill="var(--accent-primary)" color="var(--accent-primary)" />
-               </Link>
+
+        <div className="showcase-grid">
+          {[
+            { title: 'Two Sum', diff: 'Easy', acceptance: '49.2%', tags: ['Array', 'Hash Table'] },
+            { title: 'Binary Tree Inorder Traversal', diff: 'Easy', acceptance: '74.1%', tags: ['Tree', 'DFS'] },
+            { title: 'Reverse Linked List', diff: 'Easy', acceptance: '73.8%', tags: ['Linked List'] },
+            { title: 'Longest Substring Without Repeating', diff: 'Medium', acceptance: '33.8%', tags: ['Sliding Window'] },
+            { title: 'Trapping Rain Water', diff: 'Hard', acceptance: '59.4%', tags: ['Two Pointers', 'Stack'] },
+            { title: 'LRU Cache', diff: 'Medium', acceptance: '41.2%', tags: ['Design', 'Doubly Linked List'] },
+          ].map((item, idx) => (
+            <MagneticCard key={idx}>
+              <div className="problem-card-content">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <span className={`diff-badge diff-${item.diff.toLowerCase()}`}>{item.diff}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Acc: {item.acceptance}</span>
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.8rem', color: '#fff' }}>{item.title}</h3>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
+                  {item.tags.map(t => (
+                    <span key={t} style={{ background: 'rgba(255,255,255,0.05)', color: '#cbd5e1', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>{t}</span>
+                  ))}
+                </div>
+                <Link to="/problems" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#38bdf8', fontWeight: 600, fontSize: '0.9rem' }}>
+                  <span>Solve Problem</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </MagneticCard>
+          ))}
+        </div>
+      </section>
+
+      {/* Competitive Energy Arena */}
+      <section className="arena-split">
+        <div className="glass-card" style={{ padding: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
+            <div style={{ padding: '0.6rem', background: 'rgba(245,158,11,0.15)', borderRadius: '10px' }}>
+              <Trophy color="#f59e0b" size={24} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>Weekly Contest #142</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Live Competitive Arena</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="landing-section features-split">
-        <div className="feature-col">
-          <div className="hex-group">
-            <div className="hex-icon blue-hex">4200</div>
-            <div className="hex-icon green-hex"><UserCircle2 size={20} color="white" /></div>
-            <div className="hex-icon yellow-hex"><Star size={20} color="white" /></div>
+          <div style={{ background: '#090d16', padding: '1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>STARTS IN</span>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>02d : 14h : 32m</div>
+            </div>
+            <Link to="/contest" className="btn-magnetic" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+              Register
+            </Link>
           </div>
-          <h3>Questions, Community & Contests</h3>
-          <p>Over 4200 questions for you to practice. Come and join one of the largest tech communities with hundreds of thousands of active users and participate in our contests to challenge yourself and earn rewards.</p>
-          <Link to="/problems" className="link-get-started">View Questions <ChevronRight size={16} /></Link>
         </div>
-        <div className="feature-col">
-          <div className="hex-group">
-            <div className="hex-icon brown-hex"><Target size={20} color="white" /></div>
-            <div className="hex-icon grey-hex"><Lock size={20} color="white" /></div>
+
+        <div className="glass-card" style={{ padding: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
+            <div style={{ padding: '0.6rem', background: 'rgba(16,185,129,0.15)', borderRadius: '10px' }}>
+              <Flame color="#10b981" size={24} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700 }}>Global Leaderboard</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Top Performers This Week</p>
+            </div>
           </div>
-          <h3>Companies & Candidates</h3>
-          <p>Not only does JudgeX prepare candidates for technical interviews, we also help companies identify top technical talent. From sponsoring contests to providing online assessments and training, we offer numerous services to businesses.</p>
-          <Link to="/business" className="link-get-started">Business Opportunities <ChevronRight size={16} /></Link>
-        </div>
-      </div>
-
-      {/* Developer Section */}
-      <div className="landing-section developer-section">
-        <div className="dev-header">
-          <h2>Developer</h2>
-          <p>We now support 14 popular coding languages. At our core, JudgeX is about developers. Our powerful development tools such as Playground help you test, debug and even write your own projects online.</p>
-        </div>
-        
-        <div className="css-editor-container">
-           <div className="css-editor">
-             <div className="editor-top">
-               <div className="editor-tabs">
-                 {Object.keys(problemsData[activeProblem].snippets).map(lang => (
-                   <span 
-                     key={lang} 
-                     className={`tab ${activeLang === lang ? 'active' : ''}`}
-                     onClick={() => setActiveLang(lang)}
-                   >
-                     {lang}
-                   </span>
-                 ))}
-               </div>
-               <div className="editor-actions">
-                 <button className="btn-editor-action"><Lock size={12}/> Copy</button>
-                 <button className="btn-editor-run" onClick={handleRun}><Play size={12} fill="white" /> {runState === 'running' ? 'Running...' : 'Run'}</button>
-                 <button className="btn-editor-dark"><Terminal size={12}/> Playground</button>
-               </div>
-             </div>
-             <div className="editor-body">
-               <div className="line-numbers">
-                 {[...Array((problemsData[activeProblem].snippets[activeLang] || '').split('\n').length)].map((_, i) => <span key={i}>{i + 1}</span>)}
-               </div>
-               <div className="code-content">
-                 <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(problemsData[activeProblem].snippets[activeLang] || '') }} /></pre>
-               </div>
-             </div>
-             
-             {runState !== 'idle' && (
-               <div className="mock-console">
-                 <div className="console-header">
-                   <span>Console Output</span>
-                   <button onClick={() => setRunState('idle')}>✖</button>
-                 </div>
-                 <div className="console-output">
-                   {runState === 'running' ? (
-                     <span className="text-warning">Compiling and executing {activeLang} code...</span>
-                   ) : (
-                     <div>
-                       <div className="text-success" style={{ fontWeight: 'bold', marginBottom: '8px' }}>✔ Accepted</div>
-                       <div>Runtime: {Math.floor(Math.random() * 5) + 1} ms</div>
-                       <div>Memory: {Math.floor(Math.random() * 10) + 40} MB</div>
-                       <br/>
-                       <div><span style={{ color: '#94a3b8' }}>Input:</span> {problemsData[activeProblem].input}</div>
-                       <div><span style={{ color: '#94a3b8' }}>Output:</span> {problemsData[activeProblem].output}</div>
-                       <div><span style={{ color: '#94a3b8' }}>Expected:</span> {problemsData[activeProblem].output}</div>
-                     </div>
-                   )}
-                 </div>
-               </div>
-             )}
-           </div>
-           
-           <div className="editor-sidebar">
-             {Object.entries(problemsData).map(([key, data]) => (
-                <div 
-                  key={key} 
-                  className={`sidebar-link ${activeProblem === key ? 'active-link' : ''}`}
-                  onClick={() => setActiveProblem(key)}
-                  style={{ fontWeight: activeProblem === key ? 'bold' : 'normal' }}
-                >
-                  <ChevronRight size={14}/> {data.title}
-                </div>
-             ))}
-             <div className="sidebar-divider"></div>
-             <Link to="/playground" className="link-get-started">Create Playground <ChevronRight size={14}/></Link>
-           </div>
-        </div>
-
-
-      </div>
-
-      {/* Made with Love Section */}
-      <div className="landing-section made-in-sf">
-        <div className="sf-header">
-          <div className="hex-icon red-hex sf-hex">
-             <div className="bridge-icon"></div>
-          </div>
-          <h2 className="made-with-love">Made with <span className="heart">♥</span> by Samiran</h2>
-          <p className="sf-desc">
-            At JudgeX, our mission is to help you improve yourself and land your dream job. We have a sizable repository of interview resources for many companies. In the past few years, our users have landed jobs at top companies around the world.
-          </p>
-        </div>
-
-        <div className="join-team-section">
-          <p>If you are passionate about tackling some of the most interesting problems around, we would love to hear from you.</p>
-          <a href="#" className="link-join-team">Join Our Team <ChevronRight size={14}/></a>
-        </div>
-      </div>
-
-      <footer className="landing-footer">
-        <div className="footer-left">
-          <span>Copyright © 2026 JudgeX</span>
-        </div>
-        <div className="footer-right">
-          <a href="#">Download App</a> | 
-          <a href="#">Help Center</a> | 
-          <a href="#">Bug Bounty</a> | 
-          <a href="#">Terms</a> | 
-          <a href="#">Privacy Policy</a>
-          <span className="region"><span className="flag">🇺🇸</span> United States</span>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-const ExploreCard = ({ title, subtitle, chapters, items, progress, bgClass }: any) => {
-  return (
-    <div className="explore-dark-card">
-      <div className={`card-top ${bgClass}`}>
-        <p className="card-subtitle">{subtitle}</p>
-        <h3 className="card-title">{title}</h3>
-        <button className="btn-play">
-          <Play size={20} fill="white" className="play-icon" />
-        </button>
-      </div>
-      <div className="card-bottom">
-        <div className="stat">
-          <span className="stat-val">{chapters}</span>
-          <span className="stat-label">Chapters</span>
-        </div>
-        <div className="stat">
-          <span className="stat-val">{items}</span>
-          <span className="stat-label">Items</span>
-        </div>
-        <div className="stat right-align">
-          <span className="stat-val">{progress}%</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ExplorePage = () => {
-  return (
-    <div className="explore-layout dark-theme">
-      {/* Left Sidebar */}
-      <aside className="explore-sidebar">
-        <nav className="explore-nav">
-          <a href="#" className="nav-item"><Library size={18} /> Library</a>
-          <a href="#" className="nav-item"><Target size={18} /> Quest</a>
-          <a href="#" className="nav-item active"><Compass size={18} /> Explore</a>
-          <a href="#" className="nav-item"><GraduationCap size={18} /> Study Plan</a>
-        </nav>
-        <div className="sidebar-bottom">
-          <p className="signin-text">Sign in to view lists and track study progress.</p>
-          <button className="btn-signin"><UserCircle2 size={16} /> Sign in</button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="explore-main-content">
-        <header className="explore-header">
           <div>
-            <span className="welcome-text">Welcome to</span>
-            <h1>JudgeX Explore</h1>
+            {[
+              { rank: 1, name: 'Alex Coder', score: 2840, streak: '24d 🔥' },
+              { rank: 2, name: 'Samiran T.', score: 2710, streak: '19d 🔥' },
+              { rank: 3, name: 'Elena R.', score: 2650, streak: '14d 🔥' },
+            ].map(user => (
+              <div key={user.rank} className="leader-item">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                  <span className="leader-rank">#{user.rank}</span>
+                  <span style={{ fontWeight: 600, color: '#fff' }}>{user.name}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <span style={{ color: '#10b981', fontWeight: 700 }}>{user.score} pts</span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{user.streak}</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="header-actions">
-            <button className="icon-btn"><Star size={18} /></button>
-            <button className="icon-btn"><Clock size={18} /></button>
-          </div>
-        </header>
-
-        <section className="explore-section">
-          <div className="section-header-row">
-            <h2>Featured</h2>
-            <button className="btn-more">More</button>
-          </div>
-          <div className="cards-row">
-            <ExploreCard 
-               title="Data Structures and Algorithms"
-               subtitle="JudgeX's Interview Crash Course"
-               chapters={13} items={149} progress={0}
-               bgClass="bg-gradient-purple"
-            />
-            <ExploreCard 
-               title="System Design for Interviews and Beyond"
-               subtitle="JudgeX's Interview Crash Course"
-               chapters={16} items={81} progress={0}
-               bgClass="bg-gradient-green"
-            />
-            <ExploreCard 
-               title="The JudgeX Beginner's Guide"
-               subtitle=""
-               chapters={4} items={17} progress={0}
-               bgClass="bg-gradient-orange"
-            />
-            <ExploreCard 
-               title="Top Interview Questions"
-               subtitle="Easy Collection"
-               chapters={9} items={48} progress={0}
-               bgClass="bg-gradient-darkgreen"
-            />
-          </div>
-        </section>
-        
-        <section className="explore-section">
-          <div className="section-header-row">
-            <h2>Interview</h2>
-            <button className="btn-more">More</button>
-          </div>
-          <div className="cards-row">
-            <ExploreCard 
-               title="Cheatsheets"
-               subtitle="JudgeX's Interview Crash Course"
-               chapters={5} items={20} progress={0}
-               bgClass="bg-gradient-blue"
-            />
-            <ExploreCard 
-               title="Data Structures and Algorithms"
-               subtitle="JudgeX's Interview Crash Course"
-               chapters={13} items={149} progress={0}
-               bgClass="bg-gradient-purple"
-            />
-            <ExploreCard 
-               title="System Design for Interviews and Beyond"
-               subtitle="JudgeX's Interview Crash Course"
-               chapters={16} items={81} progress={0}
-               bgClass="bg-gradient-green"
-            />
-            <ExploreCard 
-               title="Top Interview Questions"
-               subtitle="Premium"
-               chapters={10} items={50} progress={0}
-               bgClass="bg-gradient-yellow"
-            />
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-};
-
-const Splash = () => {
-  const [text, setText] = useState('');
-  const fullText = "Elevate your code. Master your craft.";
-  
-  useEffect(() => {
-    let i = 0;
-    let timeoutId: ReturnType<typeof setTimeout>;
-    let intervalId: ReturnType<typeof setInterval>;
-
-    const startTyping = () => {
-      setText('');
-      i = 0;
-      intervalId = setInterval(() => {
-        setText(fullText.substring(0, i + 1));
-        i++;
-        if (i === fullText.length) {
-          clearInterval(intervalId);
-          timeoutId = setTimeout(() => {
-            startTyping();
-          }, 3000);
-        }
-      }, 100);
-    };
-
-    startTyping();
-    return () => {
-      clearInterval(intervalId);
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
-  return (
-    <div className="splash-screen">
-      <div className="splash-content">
-        <img src="/logo.png" alt="JudgeX Logo" className="splash-logo" />
-        <div className="splash-quote-container">
-           <h2 className="splash-quote">{text}<span className="cursor">|</span></h2>
         </div>
-        <Link to="/home" className="btn-launch">Launch JudgeX</Link>
-      </div>
+      </section>
+
+      {/* High Impact CTA */}
+      <section className="cta-banner glass-panel">
+        <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
+          Ready to Level Up Your <span className="text-gradient-cyan">Coding Skills?</span>
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem', fontSize: '1.1rem' }}>
+          Join thousands of developers practicing algorithms, preparing for technical interviews, and competing globally on JudgeX.
+        </p>
+        <Link to="/register" className="btn-magnetic" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
+          <span>Create Free Account</span>
+          <ChevronRight size={20} />
+        </Link>
+      </section>
+
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '2rem', textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>
+        <p>Copyright © 2026 JudgeX. Made with ♥ by Samiran.</p>
+      </footer>
     </div>
   );
 };
@@ -638,21 +399,15 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Check URL for OAuth token
     const searchParams = new URLSearchParams(window.location.search);
     const token = searchParams.get('token');
-    
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        
-        // Dispatch to Redux store
         dispatch(setCredentials({ 
           user: { id: decoded.id, email: decoded.email, username: decoded.username || decoded.email }, 
           token 
         }));
-        
-        // Clean URL by removing the ?token parameter without reloading
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (error) {
         console.error('Failed to decode token from URL', error);
@@ -662,17 +417,18 @@ const App = () => {
 
   return (
     <Router>
+      <ComputationalCanvas />
+      <CodeDnaCanvas />
       <Routes>
-        <Route path="/" element={<Splash />} />
+        <Route path="/" element={<Welcome />} />
         <Route path="/home" element={<Welcome />} />
         <Route path="/problems" element={<ProblemsPage />} />
-        <Route path="/explore" element={<ExplorePage />} />
         <Route path="/contest" element={<ContestsPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/problems/:slug" element={<Workspace />} />
         <Route path="/playground" element={<Playground />} />
-        <Route path="*" element={<div className="not-found"><h1>404 - Not Found</h1></div>} />
+        <Route path="*" element={<div className="not-found" style={{ padding: '5rem', textAlign: 'center', color: '#fff' }}><h1>404 - Page Not Found</h1></div>} />
       </Routes>
     </Router>
   );

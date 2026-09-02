@@ -106,71 +106,62 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Init Google Login
+// Initiate Google OAuth Flow
 router.get('/google', (req, res, next) => {
-  if (process.env.GOOGLE_CLIENT_ID === 'mock_google_client_id' || !process.env.GOOGLE_CLIENT_ID) {
-    // If we don't have real credentials, simulate the callback for development purposes
-    return res.redirect('/api/auth/google/callback?simulated=true');
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId || clientId.startsWith('unconfigured') || clientId.startsWith('mock')) {
+    const errorMsg = encodeURIComponent('Google OAuth is not configured on the server. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in backend/.env');
+    return res.redirect(`${FRONTEND_URL}/login?error=${errorMsg}`);
   }
-  
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
+
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false, prompt: 'select_account' })(req, res, next);
 });
 
-// Google Callback
-router.get('/google/callback', 
-  (req, res, next) => {
-    // Simulated path for quick local testing without setting up GCP credentials
-    if (req.query.simulated === 'true') {
-      const mockToken = jwt.sign({ id: 'mock123', email: 'mock@example.com' }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-      return res.redirect(`${FRONTEND_URL}/home?token=${mockToken}`);
+// Google OAuth Callback
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', { session: false }, (err: any, user: any, info: any) => {
+    if (err || !user) {
+      const errorMsg = encodeURIComponent(err?.message || info?.message || 'Google authentication failed or was cancelled.');
+      return res.redirect(`${FRONTEND_URL}/login?error=${errorMsg}`);
     }
-    
-    passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=true` })(req, res, next);
-  },
-  (req, res) => {
-    // Successful authentication
-    const user: any = req.user;
-    
-    // Generate JWT
+
     const token = jwt.sign(
       { id: user.id, email: user.email }, 
       process.env.JWT_SECRET || 'secret', 
       { expiresIn: '7d' }
     );
-    
-    // Redirect to frontend with token
-    res.redirect(`${FRONTEND_URL}/home?token=${token}`);
-  }
-);
 
-// Init GitHub Login
+    return res.redirect(`${FRONTEND_URL}/home?token=${token}`);
+  })(req, res, next);
+});
+
+// Initiate GitHub OAuth Flow
 router.get('/github', (req, res, next) => {
-  if (process.env.GITHUB_CLIENT_ID === 'mock_github_client_id' || !process.env.GITHUB_CLIENT_ID) {
-    return res.redirect('/api/auth/github/callback?simulated=true');
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  if (!clientId || clientId.startsWith('unconfigured') || clientId.startsWith('mock')) {
+    const errorMsg = encodeURIComponent('GitHub OAuth is not configured on the server. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in backend/.env');
+    return res.redirect(`${FRONTEND_URL}/login?error=${errorMsg}`);
   }
-  
+
   passport.authenticate('github', { scope: ['user:email'], session: false })(req, res, next);
 });
 
-// GitHub Callback
-router.get('/github/callback', 
-  (req, res, next) => {
-    if (req.query.simulated === 'true') {
-      const mockToken = jwt.sign({ id: 'mock456', email: 'mock_github@example.com' }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-      return res.redirect(`${FRONTEND_URL}/home?token=${mockToken}`);
+// GitHub OAuth Callback
+router.get('/github/callback', (req, res, next) => {
+  passport.authenticate('github', { session: false }, (err: any, user: any, info: any) => {
+    if (err || !user) {
+      const errorMsg = encodeURIComponent(err?.message || info?.message || 'GitHub authentication failed or was cancelled.');
+      return res.redirect(`${FRONTEND_URL}/login?error=${errorMsg}`);
     }
-    
-    passport.authenticate('github', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=true` })(req, res, next);
-  },
-  (req, res) => {
-    const user: any = req.user;
+
     const token = jwt.sign(
       { id: user.id, email: user.email }, 
       process.env.JWT_SECRET || 'secret', 
       { expiresIn: '7d' }
     );
-    res.redirect(`${FRONTEND_URL}/home?token=${token}`);
-  }
-);
+
+    return res.redirect(`${FRONTEND_URL}/home?token=${token}`);
+  })(req, res, next);
+});
 
 export default router;
