@@ -40,10 +40,14 @@ export const runCode = async (language: string, code: string, input: string, isP
       cmd = ['sh', '-c', `javac /Main.java && java -cp / Main < /input.txt`];
       break;
     case 'javascript':
-    case 'typescript': 
       image = 'node:18-alpine';
       fileName = 'main.js';
       cmd = ['sh', '-c', `node /main.js < /input.txt`];
+      break;
+    case 'typescript': 
+      image = 'node:22-alpine';
+      fileName = 'main.ts';
+      cmd = ['sh', '-c', `node --experimental-strip-types /main.ts < /input.txt`];
       break;
     default:
       return { error: `Unsupported language: ${language}`, output: '' };
@@ -67,7 +71,6 @@ export const runCode = async (language: string, code: string, input: string, isP
       Cmd: cmd,
       Tty: false,
       HostConfig: {
-        AutoRemove: true,
         Memory: 256 * 1024 * 1024, // 256MB limit
         CpuPeriod: 100000,
         CpuQuota: 100000, // 1 CPU Core
@@ -78,50 +81,61 @@ export const runCode = async (language: string, code: string, input: string, isP
       }
     });
 
-    // Create a tar archive with the code and input
-    const pack = tar.pack();
-    pack.entry({ name: fileName }, code);
-    pack.entry({ name: 'input.txt' }, input);
-    pack.finalize();
+    try {
+      // Create a tar archive with the code and input
+      const pack = tar.pack();
+      pack.entry({ name: fileName }, code);
+      pack.entry({ name: 'input.txt' }, input);
+      pack.finalize();
 
-    // Extract archive to / in the container
-    await container.putArchive(pack, { path: '/' });
+      // Extract archive to / in the container
+      await container.putArchive(pack, { path: '/' });
 
-    // Start execution
-    await container.start();
+      // Start execution
+      await container.start();
 
-    // Wait for container to finish or timeout (5 seconds)
-    const timeout = new Promise((resolve) => setTimeout(() => resolve({ Error: 'Timeout' }), 5000));
-    const wait = container.wait();
-    const result: any = await Promise.race([wait, timeout]);
+      // Wait for container to finish or timeout (5 seconds)
+      const timeout = new Promise((resolve) => setTimeout(() => resolve({ Error: 'Timeout' }), 5000));
+      const wait = container.wait();
+      const result: any = await Promise.race([wait, timeout]);
 
-    if (result.Error === 'Timeout') {
-      try { await container.kill(); } catch (e) {}
-      return { error: 'Time limit exceeded', output: '', isTimeLimit: true };
+      if (result.Error === 'Timeout') {
+        try { await container.kill(); } catch (e) {}
+        return { error: 'Time limit exceeded', output: '', isTimeLimit: true };
+      }
+
+      // Get logs
+      const logs = await container.logs({ stdout: true, stderr: true });
+      
+      // dockerode returns a multiplexed stream when Tty is false
+      // we need to strip the 8-byte header from each payload block
+      let output = '';
+      let errorOutput = '';
+      let i = 0;
+      while (i < logs.length) {
+        if (i + 8 > logs.length) break;
+        const type = logs[i];
+        const length = logs.readUInt32BE(i + 4);
+        if (i + 8 + length > logs.length) {
+          const payload = logs.toString('utf8', i + 8, logs.length);
+          if (type === 1) output += payload;
+          else if (type === 2) errorOutput += payload;
+          break;
+        }
+        const payload = logs.toString('utf8', i + 8, i + 8 + length);
+        if (type === 1) output += payload;
+        else if (type === 2) errorOutput += payload;
+        i += 8 + length;
+      }
+
+      if (result.StatusCode !== 0 || errorOutput) {
+        return { error: errorOutput || 'Runtime Error', output };
+      }
+
+      return { output, error: null };
+    } finally {
+      await container.remove({ force: true }).catch(() => {});
     }
-
-    // Get logs
-    const logs = await container.logs({ stdout: true, stderr: true });
-    
-    // dockerode returns a multiplexed stream when Tty is false
-    // we need to strip the 8-byte header from each payload block
-    let output = '';
-    let errorOutput = '';
-    let i = 0;
-    while (i < logs.length) {
-      const type = logs[i];
-      const length = logs.readUInt32BE(i + 4);
-      const payload = logs.toString('utf8', i + 8, i + 8 + length);
-      if (type === 1) output += payload;
-      else if (type === 2) errorOutput += payload;
-      i += 8 + length;
-    }
-
-    if (result.StatusCode !== 0 || errorOutput) {
-      return { error: errorOutput || 'Runtime Error', output };
-    }
-
-    return { output, error: null };
   } catch (err: any) {
     return { error: err.message || 'Sandbox error', output: '' };
   }

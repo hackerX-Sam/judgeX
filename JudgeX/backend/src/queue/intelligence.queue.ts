@@ -1,26 +1,15 @@
 import { Queue, Worker, QueueEvents } from 'bullmq';
 import { PrismaClient } from '@prisma/client';
 import { analyzeCode, generateImprovedCode } from '../services/ai.service';
-import IORedis from 'ioredis';
-import { submissionQueue } from './submission.queue';
+import { connection, submissionQueue } from './submission.queue';
 
 const prisma = new PrismaClient();
-const connection = new IORedis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  maxRetriesPerRequest: null,
-});
 
 export const intelligenceQueue = new Queue('intelligence-queue', { connection: connection as any });
 export const intelligenceEvents = new QueueEvents('intelligence-queue', { connection: connection as any });
 
 export const intelligenceWorker = new Worker('intelligence-queue', async (job) => {
   const { action, submissionId } = job.data;
-  
-  if (!process.env.OPENAI_API_KEY) {
-    console.warn('Skipping AI analysis: No OPENAI_API_KEY provided');
-    return;
-  }
 
   const submission = await prisma.submission.findUnique({
     where: { id: submissionId },

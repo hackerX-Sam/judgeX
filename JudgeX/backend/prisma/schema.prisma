@@ -64,6 +64,7 @@ model Submission {
   status        String   // PENDING, ACCEPTED, WRONG_ANSWER, TLE, MLE, COMPILATION_ERROR, RUNTIME_ERROR
   executionTime Int?     // in milliseconds
   memoryUsed    Int?     // in megabytes
+  errorMessage  String?  // Detailed error message or failure log
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   intelligence  CodeIntelligence?

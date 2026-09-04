@@ -3,20 +3,23 @@ import { Navbar } from '../../components/Navbar';
 import axios from 'axios';
 import { API_URL } from '../../config';
 import Editor from '@monaco-editor/react';
+import { Link } from 'react-router-dom';
 import { Play, Save, Settings, Share2, BookOpen, ChevronDown, PenLine, Code2 } from 'lucide-react';
+import { useTheme } from '../../theme/ThemeContext';
 import './Playground.css';
 
 const defaultSnippets: Record<string, string> = {
-  cpp: '#include <iostream>\\nusing namespace std;\\n\\nint main() {\\n    cout << "Hello World!" << endl;\\n    return 0;\\n}',
-  java: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello World!");\n    }\n}',
-  c: '#include <stdio.h>\n\nint main() {\n    printf("Hello World!\\n");\n    return 0;\n}',
-  go: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello World!")\n}',
-  rust: 'fn main() {\n    println!("Hello World!");\n}',
-  python: 'print("Hello World!")',
-  javascript: 'console.log("Hello World!");'
+  cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello World!" << endl;\n    return 0;\n}`,
+  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello World!");\n    }\n}`,
+  c: `#include <stdio.h>\n\nint main() {\n    printf("Hello World!\\n");\n    return 0;\n}`,
+  go: `package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello World!")\n}`,
+  rust: `fn main() {\n    println!("Hello World!");\n}`,
+  python: `print("Hello World!")`,
+  javascript: `console.log("Hello World!");`
 };
 
 export default function Playground() {
+  const { activeTheme, editorSettings, registerMonaco } = useTheme();
   const [language, setLanguage] = useState('cpp');
   const [code, setCode] = useState(defaultSnippets['cpp']);
   const [output, setOutput] = useState('');
@@ -34,12 +37,12 @@ export default function Playground() {
       
       const { output: resultOutput, error, runtime } = response.data;
       if (error) {
-        setOutput(`[Error]\\n${error}`);
+        setOutput(`[Error]\n${error}`);
       } else {
-        setOutput(`${resultOutput}\\n\\n=== Execution Successful ===\\nRuntime: ${runtime}ms`);
+        setOutput(`${resultOutput}\n\n=== Execution Successful ===\nRuntime: ${runtime}ms`);
       }
     } catch (err: any) {
-      setOutput(`[System Error] Failed to execute code.\\n${err.message}`);
+      setOutput(`[System Error] Failed to execute code.\n${err.message}`);
     } finally {
       setIsRunning(false);
     }
@@ -86,9 +89,9 @@ export default function Playground() {
             <ChevronDown size={14} className="pg-select-icon" />
           </div>
           
-          <button className="pg-btn-icon">
+          <Link to="/settings" className="pg-btn-icon" title="Open Settings">
             <Settings size={16} />
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -99,12 +102,18 @@ export default function Playground() {
           <Editor
             height="100%"
             language={language}
-            theme="light"
+            theme={activeTheme.monacoThemeId}
+            beforeMount={registerMonaco}
             value={code}
             onChange={(value) => setCode(value || '')}
             options={{
-              minimap: { enabled: false },
-              fontSize: 14,
+              minimap: { enabled: editorSettings.minimap },
+              fontSize: editorSettings.fontSize,
+              fontFamily: editorSettings.fontFamily,
+              wordWrap: editorSettings.wordWrap,
+              lineNumbers: editorSettings.lineNumbers,
+              cursorStyle: editorSettings.cursorStyle,
+              tabSize: editorSettings.tabSize,
               padding: { top: 16 },
               scrollBeyondLastLine: false,
               lineNumbersMinChars: 3,

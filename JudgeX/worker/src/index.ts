@@ -92,10 +92,19 @@ const worker = new Worker('submissionQueue', async (job: Job) => {
 
   } catch (error: any) {
     console.error(`[Job ${job.id}] Error:`, error.message);
-    await axios.put(`${BACKEND_URL}/api/submissions/${submissionId}`, {
-      status: 'RUNTIME_ERROR',
-      errorMessage: 'Internal worker error: ' + error.message
-    }).catch(e => console.error('Failed to report error to backend:', e.message));
+    if (job.data.isVerification) {
+      const { originalSubmissionId } = job.data;
+      if (originalSubmissionId) {
+        await axios.put(`${BACKEND_URL}/api/submissions/${originalSubmissionId}/intelligence`, {
+          improvementStatus: 'FAILED_VERIFICATION'
+        }).catch(e => console.error('Failed to report error to backend:', e.message));
+      }
+    } else {
+      await axios.put(`${BACKEND_URL}/api/submissions/${submissionId}`, {
+        status: 'RUNTIME_ERROR',
+        errorMessage: 'Internal worker error: ' + error.message
+      }).catch(e => console.error('Failed to report error to backend:', e.message));
+    }
   }
 }, { connection: redisConnection });
 

@@ -13,16 +13,35 @@ const ActivityGraph: React.FC<ActivityGraphProps> = ({ userId }) => {
 
   useEffect(() => {
     const fetchActivity = async () => {
+      if (!userId || userId === 'demo-user') {
+        // Deterministic mock activity pattern for demo/guest preview
+        const mockData: Record<string, number> = {};
+        const today = new Date();
+        for (let i = 0; i < 365; i++) {
+          // Create realistic activity distribution pattern
+          if ((i * 7 + 13) % 5 === 0 || (i * 3 + 7) % 11 === 0) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            mockData[dateStr] = ((i * 3) % 7) + 1;
+          }
+        }
+        setActivity(mockData);
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await axios.get(`${API_URL}/api/submissions/activity/${userId}`);
-        setActivity(response.data.activity);
+        setActivity(response.data.activity || {});
       } catch (err) {
         console.error('Failed to fetch activity', err);
+        setActivity({});
       } finally {
         setLoading(false);
       }
     };
-    if (userId) fetchActivity();
+    fetchActivity();
   }, [userId]);
 
   const days: (Date | null)[] = [];
@@ -63,10 +82,7 @@ const ActivityGraph: React.FC<ActivityGraphProps> = ({ userId }) => {
           if (!date) {
             return <div key={index} className="activity-square" style={{ visibility: 'hidden' }} />;
           }
-          // Adjust for local timezone offset when getting the ISO string date key
-          const tzOffset = date.getTimezoneOffset() * 60000; // offset in milliseconds
-          const localISOTime = (new Date(date.getTime() - tzOffset)).toISOString().slice(0, -1);
-          const dateString = localISOTime.split('T')[0];
+          const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
           
           const count = activity[dateString] || 0;
           return (

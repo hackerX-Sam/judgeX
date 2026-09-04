@@ -11,7 +11,20 @@ export const getProblems = async (req: Request, res: Response) => {
         title: true,
         slug: true,
         difficulty: true,
+        description: true,
+        timeLimit: true,
+        memoryLimit: true,
+        createdAt: true,
+        _count: {
+          select: {
+            submissions: true,
+            testCases: true,
+          }
+        }
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
     res.status(200).json({ problems });
   } catch (error) {

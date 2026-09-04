@@ -18,6 +18,9 @@ import Playground from './pages/Playground/Playground';
 import ActivityGraph from './components/ActivityGraph';
 import { Navbar } from './components/Navbar';
 import ContestsPage from './pages/Contests/ContestsPage';
+import ExplorePage from './pages/Explore/ExplorePage';
+import SettingsPage from './pages/Settings/SettingsPage';
+import { ThemeProvider } from './theme/ThemeContext';
 
 import ComputationalCanvas from './components/ComputationalCanvas';
 import CodeDnaCanvas from './components/CodeDnaCanvas';
@@ -117,12 +120,17 @@ const ProblemsPage = () => {
           </div>
 
           <div className="lc-sidebar">
-            {user && (
-              <div className="glass-card" style={{ padding: '1.2rem', marginBottom: '1.5rem' }}>
-                <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: '#fff' }}>Activity Graph</h4>
-                <ActivityGraph userId={user.id} />
+            <div className="glass-card" style={{ padding: '1.2rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h4 style={{ fontSize: '1rem', color: '#fff', margin: 0 }}>Activity Graph</h4>
+                {!user && (
+                  <span style={{ fontSize: '0.75rem', color: '#38bdf8', background: 'rgba(59,130,246,0.15)', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 600 }}>
+                    Preview
+                  </span>
+                )}
               </div>
-            )}
+              <ActivityGraph userId={user?.id || 'demo-user'} />
+            </div>
             <div className="glass-card" style={{ padding: '1.2rem' }}>
               <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: '#fff' }}>Top Companies</h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -175,6 +183,8 @@ const Welcome = () => {
 
   return (
     <div className="landing-page">
+      <ComputationalCanvas />
+      <CodeDnaCanvas />
       <Navbar active="home" transparent={true} />
 
       {/* Cinematic Hero */}
@@ -416,21 +426,23 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <Router>
-      <ComputationalCanvas />
-      <CodeDnaCanvas />
-      <Routes>
-        <Route path="/" element={<Welcome />} />
-        <Route path="/home" element={<Welcome />} />
-        <Route path="/problems" element={<ProblemsPage />} />
-        <Route path="/contest" element={<ContestsPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/problems/:slug" element={<Workspace />} />
-        <Route path="/playground" element={<Playground />} />
-        <Route path="*" element={<div className="not-found" style={{ padding: '5rem', textAlign: 'center', color: '#fff' }}><h1>404 - Page Not Found</h1></div>} />
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Welcome />} />
+          <Route path="/home" element={<Welcome />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/problems" element={<ProblemsPage />} />
+          <Route path="/contest" element={<ContestsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/problems/:slug" element={<Workspace />} />
+          <Route path="/playground" element={<Playground />} />
+          <Route path="*" element={<div className="not-found" style={{ padding: '5rem', textAlign: 'center', color: 'var(--jx-text)' }}><h1>404 - Page Not Found</h1></div>} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 

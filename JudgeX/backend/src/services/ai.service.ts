@@ -18,6 +18,19 @@ const AnalysisSchema = z.object({
 });
 
 export const analyzeCode = async (code: string, language: string, problemDescription: string) => {
+  if (!process.env.OPENAI_API_KEY) {
+    return {
+      timeComplexity: 'O(N)',
+      spaceComplexity: 'O(1)',
+      qualityScore: 85,
+      readabilityScore: 90,
+      codeSmells: ['OPENAI_API_KEY not configured in backend environment.'],
+      edgeCases: ['Check empty input arrays', 'Check large values exceeding max int'],
+      explanation: 'Analysis mode operating in fallback mode because OPENAI_API_KEY is not set.',
+      optimization: 'Add OPENAI_API_KEY to backend/.env to enable live GPT-4o analysis.'
+    };
+  }
+
   const prompt = `You are an expert coding judge and AI mentor. Analyze the following ${language} code submission for a programming problem.
   
 Problem Description:
@@ -31,8 +44,7 @@ Identify code smells (like duplicate logic, poor naming, deep nesting).
 Identify potential edge cases.
 Explain how the code works and how to optimize it.`;
 
-  // @ts-ignore - 'chat' does not exist on type 'Beta' in this openai SDK version typings
-  const completion = await openai.beta.chat.completions.parse({
+  const completion = await openai.chat.completions.parse({
     model: 'gpt-4o-mini',
     messages: [
       { role: 'system', content: 'You are an expert code reviewer.' },
@@ -49,6 +61,12 @@ const ImprovementSchema = z.object({
 });
 
 export const generateImprovedCode = async (originalCode: string, language: string, problemDescription: string) => {
+  if (!process.env.OPENAI_API_KEY) {
+    return {
+      improvedCode: originalCode
+    };
+  }
+
   const prompt = `You are an expert coding mentor. The user submitted the following ${language} code for a problem. 
 Your task is to write an optimized, perfectly clean, and fully working version of this code. 
 Only return the improved code without any markdown formatting or surrounding text, just the raw code.
@@ -60,8 +78,7 @@ Original Code:
 ${originalCode}
 `;
 
-  // @ts-ignore - 'chat' does not exist on type 'Beta' in this openai SDK version typings
-  const completion = await openai.beta.chat.completions.parse({
+  const completion = await openai.chat.completions.parse({
     model: 'gpt-4o-mini',
     messages: [
       { role: 'system', content: 'You are an expert programmer.' },

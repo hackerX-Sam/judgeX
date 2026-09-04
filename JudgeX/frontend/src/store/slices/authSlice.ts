@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { jwtDecode } from 'jwt-decode';
 
 interface AuthState {
   user: any | null;
@@ -7,10 +8,26 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
+const savedToken = localStorage.getItem('token');
+let initialUser: any = null;
+
+if (savedToken) {
+  try {
+    const decoded: any = jwtDecode(savedToken);
+    if (decoded && decoded.exp && decoded.exp * 1000 > Date.now()) {
+      initialUser = { id: decoded.id, email: decoded.email, username: decoded.username || decoded.email };
+    } else {
+      localStorage.removeItem('token');
+    }
+  } catch {
+    localStorage.removeItem('token');
+  }
+}
+
 const initialState: AuthState = {
-  user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: !!localStorage.getItem('token'),
+  user: initialUser,
+  token: initialUser ? savedToken : null,
+  isAuthenticated: !!initialUser,
 };
 
 const authSlice = createSlice({

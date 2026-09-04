@@ -1,28 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Sun, Moon, Compass, Code2, Trophy, MessageSquare, Sparkles, User, LogOut } from 'lucide-react';
+import { Sun, Moon, Compass, Code2, Trophy, MessageSquare, Settings, User, LogOut } from 'lucide-react';
+import { logout } from '../store/slices/authSlice';
+import { useTheme } from '../theme/ThemeContext';
 
 export const ThemeToggle = () => {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+  const { activeTheme, setThemeId } = useTheme();
 
   return (
     <button 
-      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
+      onClick={() => setThemeId(activeTheme.isLight ? 'judgex-blue' : 'light')} 
       className="theme-toggle-btn" 
       aria-label="Toggle theme"
-      title="Toggle Dark/Light Mode"
+      title={activeTheme.isLight ? "Switch to JudgeX Dark Mode" : "Switch to Light Mode"}
     >
-      {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+      {activeTheme.isLight ? <Moon size={16} /> : <Sun size={16} />}
     </button>
   );
 };
@@ -37,8 +30,8 @@ export const Navbar = ({ active, transparent = false }: { active: string; transp
         <div className="lc-logo">
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
             <img src="/logo.png" alt="JudgeX Logo" className="lc-logo-img" />
-            <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.5px', fontFamily: 'var(--font-main)' }}>
-              Judge<span style={{ color: '#3b82f6' }}>X</span>
+            <span style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--jx-text)', letterSpacing: '-0.5px', fontFamily: 'var(--font-main)' }}>
+              Judge<span style={{ color: 'var(--jx-primary)' }}>X</span>
             </span>
           </Link>
         </div>
@@ -64,18 +57,18 @@ export const Navbar = ({ active, transparent = false }: { active: string; transp
 
       <div className="lc-nav-right">
         <ThemeToggle />
-        <button className="lc-btn-premium">
-          <Sparkles size={14} />
-          <span>Premium</span>
-        </button>
+        <Link to="/settings" className={`lc-btn-settings ${active === 'settings' ? 'active' : ''}`}>
+          <Settings size={15} />
+          <span>Settings</span>
+        </Link>
 
         {user ? (
-          <div className="user-profile-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.05)', padding: '0.35rem 0.8rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
-             <User size={15} color="#38bdf8" />
-             <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.85rem' }}>{user.username}</span>
+          <div className="user-profile-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--jx-glass-bg)', padding: '0.35rem 0.8rem', borderRadius: '10px', border: '1px solid var(--jx-border)' }}>
+             <User size={15} color="var(--jx-accent)" />
+             <span style={{ color: 'var(--jx-text)', fontWeight: 600, fontSize: '0.85rem' }}>{user.username}</span>
              <button 
-               onClick={() => dispatch({ type: 'auth/logout' })}
-               style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', marginLeft: '4px' }}
+               onClick={() => dispatch(logout())}
+               style={{ background: 'transparent', border: 'none', color: 'var(--jx-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', marginLeft: '4px' }}
                title="Logout"
              >
                <LogOut size={14} />
