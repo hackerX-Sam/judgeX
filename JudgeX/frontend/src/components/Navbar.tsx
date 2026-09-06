@@ -63,9 +63,11 @@ export const Navbar = ({ active, transparent = false }: { active: string; transp
         </Link>
 
         {user ? (
-          <div className="user-profile-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--jx-glass-bg)', padding: '0.35rem 0.8rem', borderRadius: '10px', border: '1px solid var(--jx-border)' }}>
+          <div className="user-profile-menu" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--jx-glass-bg)', padding: '0.35rem 0.8rem', borderRadius: '10px', border: '1px solid var(--jx-border)' }}>
              <User size={15} color="var(--jx-accent)" />
-             <span style={{ color: 'var(--jx-text)', fontWeight: 600, fontSize: '0.85rem' }}>{user.username}</span>
+             <span style={{ color: 'var(--jx-text)', fontWeight: 600, fontSize: '0.85rem' }} title={user.email || user.username}>
+               {user.email || user.username}
+             </span>
              <button 
                onClick={() => dispatch(logout())}
                style={{ background: 'transparent', border: 'none', color: 'var(--jx-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', marginLeft: '4px' }}

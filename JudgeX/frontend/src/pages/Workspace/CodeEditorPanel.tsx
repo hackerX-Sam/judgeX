@@ -8,6 +8,7 @@ import {
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { API_URL } from '../../config';
+import { supabase } from '../../config/supabase';
 import { useTheme } from '../../theme/ThemeContext';
 
 interface Props {
@@ -156,8 +157,38 @@ export default function CodeEditorPanel({ problem }: Props) {
       const sid = response.data.submissionId;
       setSubmissionId(sid);
       setStatus('⚡ Container sandbox starting... Running test cases...');
+
+      // 1. Supabase Realtime WebSocket Listener
+      const channel = supabase
+        .channel(`submission_${sid}`)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'Submission',
+          filter: `id=eq.${sid}`
+        }, (payload) => {
+          const sub = payload.new;
+          if (sub && sub.status !== 'PENDING') {
+            supabase.removeChannel(channel);
+            if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+            setIsSubmitting(false);
+            setLastExecutionTime(sub.executionTime || 0);
+
+            let resultMessage = `Status: ${sub.status}\nRuntime: ${sub.executionTime || 0}ms`;
+            if (sub.errorMessage) {
+              resultMessage += `\nError:\n${sub.errorMessage}`;
+            }
+            setStatus(resultMessage);
+
+            if (sub.status !== 'COMPILATION_ERROR') {
+              setIsAnalyzing(true);
+              pollForIntelligence(sid);
+            }
+          }
+        })
+        .subscribe();
       
-      // Poll for normal execution
+      // 2. Backup Polling Fallback
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
       
       pollIntervalRef.current = setInterval(async () => {
@@ -166,6 +197,7 @@ export default function CodeEditorPanel({ problem }: Props) {
           const sub = checkRes.data.submission;
           
           if (sub.status !== 'PENDING') {
+            supabase.removeChannel(channel);
             if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
             setIsSubmitting(false);
             setLastExecutionTime(sub.executionTime || 0);
@@ -176,7 +208,6 @@ export default function CodeEditorPanel({ problem }: Props) {
             }
             setStatus(resultMessage);
             
-            // If it's a valid run, wait for AI analysis in the background
             if (sub.status !== 'COMPILATION_ERROR') {
               setIsAnalyzing(true);
               pollForIntelligence(sid);

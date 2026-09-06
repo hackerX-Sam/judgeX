@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { setCredentials } from './store/slices/authSlice';
 import axios from 'axios';
 import { API_URL } from './config';
+import { supabase } from './config/supabase';
 import { 
   CheckCircle2, Circle, ChevronRight, Search, 
   Play, Terminal, Flame, Trophy, Sparkles, ArrowRight 
@@ -409,6 +410,7 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // 1. Check for URL token (OAuth Callback redirect)
     const searchParams = new URLSearchParams(window.location.search);
     const token = searchParams.get('token');
     if (token) {
@@ -423,6 +425,36 @@ const App = () => {
         console.error('Failed to decode token from URL', error);
       }
     }
+
+    // 2. Initial Supabase session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        dispatch(setCredentials({
+          user: {
+            id: session.user.id,
+            email: session.user.email || '',
+            username: session.user.user_metadata?.username || session.user.email?.split('@')[0]
+          },
+          token: session.access_token
+        }));
+      }
+    });
+
+    // 3. Listen to Supabase auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        dispatch(setCredentials({
+          user: {
+            id: session.user.id,
+            email: session.user.email || '',
+            username: session.user.user_metadata?.username || session.user.email?.split('@')[0]
+          },
+          token: session.access_token
+        }));
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [dispatch]);
 
   return (

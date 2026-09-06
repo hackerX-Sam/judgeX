@@ -1,9 +1,63 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { submissionQueue, queueEvents } from '../queue/submission.queue';
+import { submissionQueue, queueEvents, isRedisConnected } from '../queue/submission.queue';
 import { intelligenceQueue } from '../queue/intelligence.queue';
+import { runLocalCode } from '../services/localRunner';
 
 const prisma = new PrismaClient();
+
+const processSubmissionLocally = async (submissionId: string, problem: any, code: string, language: string) => {
+  try {
+    const testCases = problem.testCases || [];
+    let finalStatus = 'ACCEPTED';
+    let errorMessage: string | null = null;
+    let maxRuntime = 0;
+
+    for (let i = 0; i < testCases.length; i++) {
+      const tc = testCases[i];
+      const res = await runLocalCode(language, code, tc.input);
+      if (res.runtime > maxRuntime) maxRuntime = res.runtime;
+
+      if (res.error) {
+        finalStatus = 'RUNTIME_ERROR';
+        errorMessage = res.error;
+        break;
+      }
+
+      const actual = (res.output || '').trim();
+      const expected = (tc.expectedOutput || '').trim();
+
+      if (actual !== expected) {
+        finalStatus = 'WRONG_ANSWER';
+        errorMessage = `Test Case ${i + 1} Failed.\nInput: ${tc.input}\nExpected: ${expected}\nGot: ${actual}`;
+        break;
+      }
+    }
+
+    await prisma.submission.update({
+      where: { id: submissionId },
+      data: {
+        status: finalStatus,
+        executionTime: maxRuntime,
+        errorMessage
+      }
+    });
+
+    try {
+      if (isRedisConnected) {
+        await intelligenceQueue.add('analyze', { action: 'analyze', submissionId });
+      }
+    } catch (e) {}
+  } catch (err: any) {
+    await prisma.submission.update({
+      where: { id: submissionId },
+      data: {
+        status: 'RUNTIME_ERROR',
+        errorMessage: 'Local runner error: ' + err.message
+      }
+    });
+  }
+};
 
 export const createSubmission = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -17,22 +71,23 @@ export const createSubmission = async (req: Request, res: Response): Promise<any
     const targetProblem = await prisma.problem.findFirst({
       where: {
         OR: [{ id: problemId }, { slug: problemId }]
-      }
+      },
+      include: { testCases: true }
     });
 
     if (!targetProblem) {
       return res.status(404).json({ error: 'Problem not found' });
     }
 
-    // Ensure the mock user exists in the DB to satisfy Foreign Key constraints
+    // Ensure the user exists in the DB to satisfy Foreign Key constraints
     await prisma.user.upsert({
       where: { id: userId },
       update: {},
       create: {
         id: userId,
-        email: 'mockuser@example.com',
-        username: 'mockuser',
-        fullName: 'Mock User',
+        email: 'user@example.com',
+        username: 'user_' + userId.substring(0, 8),
+        fullName: 'User',
         provider: 'local',
       }
     });
@@ -48,15 +103,26 @@ export const createSubmission = async (req: Request, res: Response): Promise<any
       },
     });
 
-    // 2. Push to Redis Queue (BullMQ) for the worker to process
-    await submissionQueue.add('execute-code', {
-      submissionId: submission.id,
-      problemId: targetProblem.id,
-      code,
-      language
-    });
+    let queueSuccess = false;
+    if (isRedisConnected) {
+      try {
+        await submissionQueue.add('execute-code', {
+          submissionId: submission.id,
+          problemId: targetProblem.id,
+          code,
+          language
+        });
+        queueSuccess = true;
+      } catch (err) {
+        queueSuccess = false;
+      }
+    }
 
-    // For now, immediately return the pending submission
+    // 2. Fallback execution if Redis/Worker is offline
+    if (!queueSuccess) {
+      processSubmissionLocally(submission.id, targetProblem, code, language);
+    }
+
     res.status(202).json({ 
       message: 'Submission received and is pending execution', 
       submissionId: submission.id 
@@ -69,29 +135,33 @@ export const createSubmission = async (req: Request, res: Response): Promise<any
 
 export const executePlayground = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { code, language } = req.body;
+    const { code, language, input } = req.body;
 
     if (!code || !language) {
       return res.status(400).json({ error: 'Missing code or language' });
     }
 
-    try {
-      const job = await submissionQueue.add('execute-playground', {
-        problemId: 'playground',
-        code,
-        language,
-        input: ''
-      });
-      const result = await job.waitUntilFinished(queueEvents);
-      return res.status(200).json(result);
-    } catch (queueError: any) {
-      console.warn('[Queue Warning] Redis queue offline/unreachable:', queueError.message);
-      return res.status(200).json({
-        output: `[Execution Simulated]\nLanguage: ${language}\nCode compiled successfully. (Start Redis & Docker worker for full sandboxed execution).`,
-        error: null,
-        runtime: 4
-      });
+    if (isRedisConnected) {
+      try {
+        const job = await submissionQueue.add('execute-playground', {
+          problemId: 'playground',
+          code,
+          language,
+          input: input || ''
+        });
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Worker response timeout')), 3000)
+        );
+        const result = await Promise.race([job.waitUntilFinished(queueEvents), timeout]);
+        return res.status(200).json(result);
+      } catch (queueError: any) {
+        console.warn('[Queue Warning] Fallback to local execution:', queueError.message);
+      }
     }
+
+    // Fallback: Run local code runner
+    const localResult = await runLocalCode(language, code, input || '');
+    return res.status(200).json(localResult);
   } catch (error) {
     console.error('Error executing playground code:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -160,7 +230,6 @@ export const getActivity = async (req: Request, res: Response): Promise<any> => 
     // Group by YYYY-MM-DD
     const activityMap: Record<string, number> = {};
     for (const sub of submissions) {
-      // Get date string (YYYY-MM-DD format based on UTC)
       const dateString = sub.createdAt.toISOString().split('T')[0];
       activityMap[dateString] = (activityMap[dateString] || 0) + 1;
     }
@@ -201,7 +270,9 @@ export const getSolvedProblems = async (req: Request, res: Response): Promise<an
 export const analyzeSubmission = async (req: Request, res: Response): Promise<any> => {
   try {
     const id = req.params.id as string;
-    await intelligenceQueue.add('analyze', { action: 'analyze', submissionId: id });
+    if (isRedisConnected) {
+      await intelligenceQueue.add('analyze', { action: 'analyze', submissionId: id });
+    }
     res.status(202).json({ message: 'Analysis queued' });
   } catch (error) {
     console.error('Error queuing analysis:', error);
@@ -212,7 +283,9 @@ export const analyzeSubmission = async (req: Request, res: Response): Promise<an
 export const improveSubmission = async (req: Request, res: Response): Promise<any> => {
   try {
     const id = req.params.id as string;
-    await intelligenceQueue.add('improve', { action: 'improve', submissionId: id });
+    if (isRedisConnected) {
+      await intelligenceQueue.add('improve', { action: 'improve', submissionId: id });
+    }
     res.status(202).json({ message: 'Improvement queued' });
   } catch (error) {
     console.error('Error queuing improvement:', error);
