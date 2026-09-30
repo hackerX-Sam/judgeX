@@ -122,8 +122,44 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleOAuth = (provider: 'google' | 'github') => {
+  const handleOAuth = async (provider: 'google' | 'github') => {
     setError(null);
+    setIsLoading(true);
+
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const isSupabaseConfigured = supabaseUrl && !supabaseUrl.includes('placeholder');
+
+    try {
+      if (isSupabaseConfigured) {
+        const { error: oauthErr } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: `${window.location.origin}/home`,
+          },
+        });
+        if (oauthErr) {
+          console.warn(`Supabase ${provider} OAuth failed, trying backend:`, oauthErr.message);
+          await redirectBackendOAuth(provider);
+        }
+      } else {
+        await redirectBackendOAuth(provider);
+      }
+    } catch (err: any) {
+      setError(err.message || `Failed to initiate ${provider} login.`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const redirectBackendOAuth = async (provider: 'google' | 'github') => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      await fetch(`${API_URL}/api/auth/google`, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
+      clearTimeout(timeoutId);
+    } catch (e) {
+      throw new Error(`Backend server is not running on ${API_URL}. Please start the backend server by running 'npm run dev' inside the backend directory.`);
+    }
     window.location.href = `${API_URL}/api/auth/${provider}`;
   };
 
