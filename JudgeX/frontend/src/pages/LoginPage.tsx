@@ -119,14 +119,10 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const redirectBackendOAuth = async (provider: 'google' | 'github') => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      await fetch(`${API_URL}/api/auth/google`, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
-      clearTimeout(timeoutId);
-    } catch (e) {
-      throw new Error(`Backend server is not running on ${API_URL}. Please start the backend server by running 'npm run dev' inside the backend folder.`);
+  const redirectBackendOAuth = (provider: 'google' | 'github') => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost && API_URL.includes('localhost')) {
+      throw new Error('Backend URL is not configured for production. Please set VITE_API_URL in your Vercel Environment Variables.');
     }
     window.location.href = `${API_URL}/api/auth/${provider}`;
   };
