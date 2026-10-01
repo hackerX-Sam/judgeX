@@ -9,7 +9,7 @@ import AnimatedCounter from '../../components/AnimatedCounter';
 import { 
   Search, Compass, CheckCircle2, Circle, Trophy, Flame, 
   Sparkles, Code2, ArrowRight, Layers, X, RefreshCw, Filter, 
-  SlidersHorizontal, Check, BookOpen, Cpu, Hash
+  SlidersHorizontal, Cpu, Hash
 } from 'lucide-react';
 import './ExplorePage.css';
 

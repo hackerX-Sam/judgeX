@@ -3,7 +3,7 @@ import Editor, { DiffEditor } from '@monaco-editor/react';
 import axios from 'axios';
 import { 
   Play, Send, Brain, Wand2, Lightbulb, RotateCcw, 
-  Settings, CheckCircle2, XCircle, Clock, Cpu, Code2, Sparkles, Terminal 
+  Sparkles, Terminal 
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';

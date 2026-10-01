@@ -6,7 +6,7 @@ import { THEMES } from '../../theme/themeRegistry';
 import type { ThemeId } from '../../theme/themeRegistry';
 import { 
   User, Palette, Code2, Bell, Keyboard, Shield, Sliders, 
-  Sparkles, Check, ChevronRight, Download, Monitor, Volume2, Globe, Lock
+  Sparkles, Check, Download, Monitor
 } from 'lucide-react';
 import './SettingsPage.css';
 
