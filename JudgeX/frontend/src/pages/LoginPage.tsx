@@ -46,7 +46,7 @@ const LoginPage: React.FC = () => {
 
     try {
       if (isSupabaseConfigured) {
-        // Login via Supabase Auth
+        // 1. Authenticate via Supabase Auth
         const { data, error: authError } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password
@@ -77,23 +77,18 @@ const LoginPage: React.FC = () => {
         }
       }
 
-      // Fallback session login
-      const devUser = {
-        id: 'user-id-' + Date.now(),
+      // 2. Authenticate via Backend API /api/auth/login
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email: formData.email,
-        username: formData.email.split('@')[0] || 'developer',
-      };
-      dispatch(setCredentials({ user: devUser, token: 'dev-jwt-token' }));
+        password: formData.password
+      });
+
+      const { user, token } = response.data;
+      dispatch(setCredentials({ user, token }));
       navigate('/problems');
-    } catch {
-      // Graceful fallback for production demo users
-      const devUser = {
-        id: 'user-id-' + Date.now(),
-        email: formData.email,
-        username: formData.email.split('@')[0] || 'developer',
-      };
-      dispatch(setCredentials({ user: devUser, token: 'dev-jwt-token' }));
-      navigate('/problems');
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || err.message || 'Login failed. Please check your credentials.';
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -120,33 +115,14 @@ const LoginPage: React.FC = () => {
       } else {
         await redirectBackendOAuth(provider);
       }
-    } catch {
-      const devUser = {
-        id: `${provider}-user-id-123`,
-        email: `${provider}_user@judgex.dev`,
-        username: `${provider}_coder`,
-        fullName: `${provider.toUpperCase()} Developer`
-      };
-      dispatch(setCredentials({ user: devUser, token: `${provider}-jwt-token` }));
-      navigate('/problems');
+    } catch (err: any) {
+      setError(err.message || `Failed to initiate ${provider} OAuth authentication.`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const redirectBackendOAuth = (provider: 'google' | 'github') => {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (!isLocalhost && API_URL.includes('localhost')) {
-      const devUser = {
-        id: `${provider}-user-id-123`,
-        email: `${provider}_user@judgex.dev`,
-        username: `${provider}_coder`,
-        fullName: `${provider.toUpperCase()} Developer`
-      };
-      dispatch(setCredentials({ user: devUser, token: `${provider}-jwt-token` }));
-      navigate('/problems');
-      return;
-    }
     window.location.href = `${API_URL}/api/auth/${provider}`;
   };
 

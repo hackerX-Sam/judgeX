@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Sun, Moon, Compass, Code2, Trophy, MessageSquare, Settings, User, LogOut } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { useTheme } from '../theme/ThemeContext';
+import { supabase } from '../config/supabase';
 
 export const ThemeToggle = () => {
   const { activeTheme, setThemeId } = useTheme();
@@ -69,7 +70,14 @@ export const Navbar = ({ active, transparent = false }: { active: string; transp
                {user.email || user.username}
              </span>
              <button 
-               onClick={() => dispatch(logout())}
+               onClick={async () => {
+                 try {
+                   await supabase.auth.signOut();
+                 } catch (e) {
+                   console.warn('Supabase signout exception:', e);
+                 }
+                 dispatch(logout());
+               }}
                style={{ background: 'transparent', border: 'none', color: 'var(--jx-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', marginLeft: '4px' }}
                title="Logout"
              >

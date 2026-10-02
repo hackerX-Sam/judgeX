@@ -102,28 +102,32 @@ const RegisterPage: React.FC = () => {
 
           navigate('/problems');
           return;
+        } else {
+          alert('Registration successful! Please check your email to verify your account.');
+          navigate('/login');
+          return;
         }
       }
 
-      // Fallback session registration
-      const devUser = {
-        id: 'dev-user-id-' + Date.now(),
+      // Register via Backend API /api/auth/register
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
         email: formData.email,
-        username: formData.username || formData.email.split('@')[0],
-        fullName: formData.fullName
-      };
-      dispatch(setCredentials({ user: devUser, token: 'dev-jwt-token' }));
+        username: formData.username,
+        password: formData.password,
+        fullName: formData.fullName,
+        profilePic: formData.profilePic,
+        country: formData.country,
+        institution: formData.institution,
+        github: formData.github,
+        linkedin: formData.linkedin,
+      });
+
+      const { user, token } = response.data;
+      dispatch(setCredentials({ user, token }));
       navigate('/problems');
-    } catch {
-      // Graceful fallback for production registration
-      const devUser = {
-        id: 'dev-user-id-' + Date.now(),
-        email: formData.email,
-        username: formData.username || formData.email.split('@')[0],
-        fullName: formData.fullName
-      };
-      dispatch(setCredentials({ user: devUser, token: 'dev-jwt-token' }));
-      navigate('/problems');
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || err.message || 'Registration failed.';
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -150,33 +154,14 @@ const RegisterPage: React.FC = () => {
       } else {
         await redirectBackendOAuth(provider);
       }
-    } catch {
-      const devUser = {
-        id: `${provider}-user-id-123`,
-        email: `${provider}_user@judgex.dev`,
-        username: `${provider}_coder`,
-        fullName: `${provider.toUpperCase()} Developer`
-      };
-      dispatch(setCredentials({ user: devUser, token: `${provider}-jwt-token` }));
-      navigate('/problems');
+    } catch (err: any) {
+      setError(err.message || `Failed to initiate ${provider} OAuth authentication.`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const redirectBackendOAuth = (provider: 'google' | 'github') => {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (!isLocalhost && API_URL.includes('localhost')) {
-      const devUser = {
-        id: `${provider}-user-id-123`,
-        email: `${provider}_user@judgex.dev`,
-        username: `${provider}_coder`,
-        fullName: `${provider.toUpperCase()} Developer`
-      };
-      dispatch(setCredentials({ user: devUser, token: `${provider}-jwt-token` }));
-      navigate('/problems');
-      return;
-    }
     window.location.href = `${API_URL}/api/auth/${provider}`;
   };
 
