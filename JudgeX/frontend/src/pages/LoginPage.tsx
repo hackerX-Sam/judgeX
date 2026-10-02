@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
       };
       dispatch(setCredentials({ user: devUser, token: 'dev-jwt-token' }));
       navigate('/problems');
-    } catch (err: any) {
+    } catch {
       // Graceful fallback for production demo users
       const devUser = {
         id: 'user-id-' + Date.now(),
@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
       } else {
         await redirectBackendOAuth(provider);
       }
-    } catch (err: any) {
+    } catch {
       const devUser = {
         id: `${provider}-user-id-123`,
         email: `${provider}_user@judgex.dev`,

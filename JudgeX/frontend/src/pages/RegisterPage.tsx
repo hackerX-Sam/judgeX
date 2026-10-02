@@ -114,7 +114,7 @@ const RegisterPage: React.FC = () => {
       };
       dispatch(setCredentials({ user: devUser, token: 'dev-jwt-token' }));
       navigate('/problems');
-    } catch (err: any) {
+    } catch {
       // Graceful fallback for production registration
       const devUser = {
         id: 'dev-user-id-' + Date.now(),
@@ -150,7 +150,7 @@ const RegisterPage: React.FC = () => {
       } else {
         await redirectBackendOAuth(provider);
       }
-    } catch (err: any) {
+    } catch {
       const devUser = {
         id: `${provider}-user-id-123`,
         email: `${provider}_user@judgex.dev`,

@@ -175,14 +175,14 @@ function extractConstraints(desc: string, explicitConstraints?: string[]): strin
     const liMatches = rawSection.match(/<li>(.*?)<\/li>/gi);
     if (liMatches) {
       liMatches.forEach(li => {
-        const text = htmlToMarkdown(li.replace(/<\/?li>/gi, '')).replace(/^[\-\*\s]+/, '').trim();
+        const text = htmlToMarkdown(li.replace(/<\/?li>/gi, '')).replace(/^[-*\s]+/, '').trim();
         if (text) constraints.push(text);
       });
     } else {
       // Split by code tags or bullet points
       const lines = rawSection.split(/\r?\n|<br\s*\/?>/);
       lines.forEach(line => {
-        const clean = htmlToMarkdown(line).replace(/^[•\-\*\d+\.]\s*/, '').trim();
+        const clean = htmlToMarkdown(line).replace(/^[•\-*\d+.]\s*/, '').trim();
         if (clean && clean.length > 2 && !clean.toLowerCase().startsWith('example')) {
           constraints.push(clean);
         }
@@ -475,14 +475,14 @@ function extractVisualizationData(examples: ParsedExample[], type: Visualization
       try {
         // Safe JSON array parsing
         elements = JSON.parse(val);
-      } catch (e) {
+      } catch (_e) {
         // Fallback comma split
-        elements = val.replace(/[\[\]]/g, '').split(',').map(s => s.trim());
+        elements = val.replace(/[[\]]/g, '').split(',').map(s => s.trim());
       }
     } else if (key.toLowerCase().includes('target') || key.toLowerCase() === 'k' || key.toLowerCase() === 'x') {
       try {
         target = JSON.parse(val);
-      } catch (e) {
+      } catch (_e) {
         target = val;
       }
     }
