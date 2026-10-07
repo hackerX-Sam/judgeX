@@ -54,46 +54,46 @@
   transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
-/* Paper 1 - Shifted Left */
+/* Paper 1 - Shifted Right & Clearance */
 .folder.open .paper:nth-child(1) {
-  transform: translate(calc(-175% + var(--magnet-x, 0px)), calc(-125% + var(--magnet-y, 0px))) rotateZ(-9deg) scale(1.12);
+  transform: translate(calc(-125% + var(--magnet-x, 0px)), calc(-90% + var(--magnet-y, 0px))) rotateZ(-9deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(1):hover {
-  transform: translate(calc(-175% + var(--magnet-x, 0px)), calc(-138% + var(--magnet-y, 0px))) rotateZ(-9deg) scale(1.22);
+  transform: translate(calc(-125% + var(--magnet-x, 0px)), calc(-102% + var(--magnet-y, 0px))) rotateZ(-9deg) scale(1.22);
   z-index: 20;
   box-shadow: 0 20px 45px rgba(59, 130, 246, 0.5);
 }
 
-/* Paper 2 - Shifted Left */
+/* Paper 2 - Shifted Right & Clearance */
 .folder.open .paper:nth-child(2) {
-  transform: translate(calc(-68% + var(--magnet-x, 0px)), calc(-135% + var(--magnet-y, 0px))) rotateZ(-3deg) scale(1.12);
+  transform: translate(calc(-25% + var(--magnet-x, 0px)), calc(-100% + var(--magnet-y, 0px))) rotateZ(-3deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(2):hover {
-  transform: translate(calc(-68% + var(--magnet-x, 0px)), calc(-148% + var(--magnet-y, 0px))) rotateZ(-3deg) scale(1.22);
+  transform: translate(calc(-25% + var(--magnet-x, 0px)), calc(-112% + var(--magnet-y, 0px))) rotateZ(-3deg) scale(1.22);
   z-index: 20;
   box-shadow: 0 20px 45px rgba(6, 182, 212, 0.5);
 }
 
-/* Paper 3 - Shifted Left */
+/* Paper 3 - Shifted Right & Clearance */
 .folder.open .paper:nth-child(3) {
-  transform: translate(calc(38% + var(--magnet-x, 0px)), calc(-135% + var(--magnet-y, 0px))) rotateZ(2deg) scale(1.12);
+  transform: translate(calc(75% + var(--magnet-x, 0px)), calc(-100% + var(--magnet-y, 0px))) rotateZ(2deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(3):hover {
-  transform: translate(calc(38% + var(--magnet-x, 0px)), calc(-148% + var(--magnet-y, 0px))) rotateZ(2deg) scale(1.22);
+  transform: translate(calc(75% + var(--magnet-x, 0px)), calc(-112% + var(--magnet-y, 0px))) rotateZ(2deg) scale(1.22);
   z-index: 20;
   box-shadow: 0 20px 45px rgba(16, 185, 129, 0.5);
 }
 
-/* Paper 4 - Shifted Left */
+/* Paper 4 - Shifted Right & Clearance */
 .folder.open .paper:nth-child(4) {
-  transform: translate(calc(145% + var(--magnet-x, 0px)), calc(-125% + var(--magnet-y, 0px))) rotateZ(7deg) scale(1.12);
+  transform: translate(calc(175% + var(--magnet-x, 0px)), calc(-90% + var(--magnet-y, 0px))) rotateZ(7deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(4):hover {
-  transform: translate(calc(145% + var(--magnet-x, 0px)), calc(-138% + var(--magnet-y, 0px))) rotateZ(7deg) scale(1.22);
+  transform: translate(calc(175% + var(--magnet-x, 0px)), calc(-102% + var(--magnet-y, 0px))) rotateZ(7deg) scale(1.22);
   z-index: 20;
   box-shadow: 0 20px 45px rgba(245, 158, 11, 0.5);
 }

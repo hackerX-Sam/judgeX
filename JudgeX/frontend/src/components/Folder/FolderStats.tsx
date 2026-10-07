@@ -125,7 +125,7 @@ export const FolderStats: React.FC = () => {
           alignItems: 'center', 
           justifyContent: 'center', 
           position: 'relative',
-          paddingTop: '60px',
+          paddingTop: '95px',
           margin: '0 auto',
           textAlign: 'center'
         }}
