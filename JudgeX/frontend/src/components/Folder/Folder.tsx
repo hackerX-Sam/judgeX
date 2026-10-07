@@ -53,7 +53,10 @@ export const Folder: React.FC<FolderProps> = ({
 
   const folderBackColor = darkenColor(color, 0.15);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    if (open && (e.target as HTMLElement).closest('.paper')) {
+      return;
+    }
     const nextState = !open;
     if (onOpenChange) {
       onOpenChange(nextState);
@@ -104,7 +107,7 @@ export const Folder: React.FC<FolderProps> = ({
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            handleClick();
+            handleClick(e as any);
           }
         }}
         tabIndex={0}
@@ -120,10 +123,11 @@ export const Folder: React.FC<FolderProps> = ({
               onMouseMove={e => handlePaperMouseMove(e, i)}
               onMouseLeave={e => handlePaperMouseLeave(e, i)}
               style={
-                open && (paperOffsets[i]?.x || paperOffsets[i]?.y)
-                  ? {
-                      transform: `translate(calc(-50% + ${paperOffsets[i]?.x || 0}px), calc(-50% + ${paperOffsets[i]?.y || 0}px))`
-                    }
+                open
+                  ? ({
+                      '--magnet-x': `${paperOffsets[i]?.x || 0}px`,
+                      '--magnet-y': `${paperOffsets[i]?.y || 0}px`
+                    } as React.CSSProperties)
                   : {}
               }
             >
