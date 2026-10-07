@@ -48,6 +48,10 @@
   transform: translateY(-4px);
 }
 
+.folder.open .paper {
+  transition: transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
 /* Paper 1 - Far Left */
 .folder.open .paper:nth-child(1) {
   transform: translate(calc(-140% + var(--magnet-x, 0px)), calc(-115% + var(--magnet-y, 0px))) rotateZ(-12deg);

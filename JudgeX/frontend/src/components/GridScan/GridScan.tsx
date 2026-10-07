@@ -411,6 +411,7 @@ export const GridScan: React.FC<GridScanProps> = ({
         leaveTimer = null;
       }
       const rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
       const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
       lookTarget.current.set(nx, ny);
