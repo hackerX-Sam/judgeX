@@ -44,7 +44,7 @@ export const FolderStats: React.FC = () => {
       <div style={{ background: 'rgba(16, 185, 129, 0.15)', padding: '0.4rem', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2px' }}>
         <ShieldCheck size={22} color="#10b981" />
       </div>
-      <div style={{ fontSize: '1.45rem', fontWeight 900, letterSpacing: '-0.5px' }} className="text-gradient-emerald">
+      <div style={{ fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.5px' }} className="text-gradient-emerald">
         <AnimatedCounter end={99.9} suffix="%" />
       </div>
       <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
