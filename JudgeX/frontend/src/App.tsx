@@ -29,6 +29,7 @@ import ComputationalCanvas from './components/ComputationalCanvas';
 import CodeDnaCanvas from './components/CodeDnaCanvas';
 import GlobalBackground from './components/GlobalBackground';
 import TechText from './components/TechText';
+import FolderStats from './components/Folder/FolderStats';
 import AnimatedCounter from './components/AnimatedCounter';
 import MagneticCard from './components/MagneticCard';
 import InteractiveStoryline from './components/InteractiveStoryline';
@@ -282,35 +283,8 @@ const Welcome = () => {
         </div>
       </section>
 
-      {/* Live Animated Statistics Banner */}
-      <section className="stats-banner">
-        <div className="glass-card stats-grid">
-          <div className="stat-box">
-            <div className="stat-number text-gradient-blue">
-              <AnimatedCounter end={4200} suffix="+" />
-            </div>
-            <div className="stat-label">Curated Problems</div>
-          </div>
-          <div className="stat-box">
-            <div className="stat-number text-gradient-cyan">
-              <AnimatedCounter end={125000} suffix="+" />
-            </div>
-            <div className="stat-label">Submissions Judged</div>
-          </div>
-          <div className="stat-box">
-            <div className="stat-number text-gradient-emerald">
-              <AnimatedCounter end={99.9} prefix="" suffix="%" />
-            </div>
-            <div className="stat-label">Sandbox Uptime</div>
-          </div>
-          <div className="stat-box">
-            <div className="stat-number text-gradient-amber">
-              <AnimatedCounter end={14} suffix=" Languages" />
-            </div>
-            <div className="stat-label">Docker Execution Environments</div>
-          </div>
-        </div>
-      </section>
+      {/* Interactive React Bits Folder Stats Section */}
+      <FolderStats />
 
       {/* Visual Storytelling Section */}
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 2rem' }}>
