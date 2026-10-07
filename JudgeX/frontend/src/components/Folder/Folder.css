@@ -23,17 +23,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   outline: none;
 }
 
 .folder:not(.open):hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-8px) scale(1.03);
 }
 
 .folder:not(.open):hover .paper {
-  transform: translate(-50%, -20%);
+  transform: translate(-50%, -25%) scale(0.72);
+  opacity: 0.9;
 }
 
 .folder:not(.open):hover .folder__front {
@@ -49,51 +50,52 @@
 }
 
 .folder.open .paper {
-  transition: transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+  opacity: 1;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
-/* Paper 1 - Far Left */
+/* Paper 1 - Uniform Far Left */
 .folder.open .paper:nth-child(1) {
-  transform: translate(calc(-140% + var(--magnet-x, 0px)), calc(-115% + var(--magnet-y, 0px))) rotateZ(-12deg);
+  transform: translate(calc(-160% + var(--magnet-x, 0px)), calc(-125% + var(--magnet-y, 0px))) rotateZ(-8deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(1):hover {
-  transform: translate(calc(-140% + var(--magnet-x, 0px)), calc(-128% + var(--magnet-y, 0px))) rotateZ(-12deg) scale(1.08);
+  transform: translate(calc(-160% + var(--magnet-x, 0px)), calc(-138% + var(--magnet-y, 0px))) rotateZ(-8deg) scale(1.22);
   z-index: 20;
-  box-shadow: 0 18px 40px rgba(59, 130, 246, 0.45);
+  box-shadow: 0 20px 45px rgba(59, 130, 246, 0.5);
 }
 
-/* Paper 2 - Center Left */
+/* Paper 2 - Uniform Center Left */
 .folder.open .paper:nth-child(2) {
-  transform: translate(calc(-45% + var(--magnet-x, 0px)), calc(-135% + var(--magnet-y, 0px))) rotateZ(-4deg);
+  transform: translate(calc(-53% + var(--magnet-x, 0px)), calc(-135% + var(--magnet-y, 0px))) rotateZ(-2.5deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(2):hover {
-  transform: translate(calc(-45% + var(--magnet-x, 0px)), calc(-148% + var(--magnet-y, 0px))) rotateZ(-4deg) scale(1.08);
+  transform: translate(calc(-53% + var(--magnet-x, 0px)), calc(-148% + var(--magnet-y, 0px))) rotateZ(-2.5deg) scale(1.22);
   z-index: 20;
-  box-shadow: 0 18px 40px rgba(6, 182, 212, 0.45);
+  box-shadow: 0 20px 45px rgba(6, 182, 212, 0.5);
 }
 
-/* Paper 3 - Center Right */
+/* Paper 3 - Uniform Center Right */
 .folder.open .paper:nth-child(3) {
-  transform: translate(calc(45% + var(--magnet-x, 0px)), calc(-135% + var(--magnet-y, 0px))) rotateZ(4deg);
+  transform: translate(calc(53% + var(--magnet-x, 0px)), calc(-135% + var(--magnet-y, 0px))) rotateZ(2.5deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(3):hover {
-  transform: translate(calc(45% + var(--magnet-x, 0px)), calc(-148% + var(--magnet-y, 0px))) rotateZ(4deg) scale(1.08);
+  transform: translate(calc(53% + var(--magnet-x, 0px)), calc(-148% + var(--magnet-y, 0px))) rotateZ(2.5deg) scale(1.22);
   z-index: 20;
-  box-shadow: 0 18px 40px rgba(16, 185, 129, 0.45);
+  box-shadow: 0 20px 45px rgba(16, 185, 129, 0.5);
 }
 
-/* Paper 4 - Far Right */
+/* Paper 4 - Uniform Far Right */
 .folder.open .paper:nth-child(4) {
-  transform: translate(calc(140% + var(--magnet-x, 0px)), calc(-115% + var(--magnet-y, 0px))) rotateZ(12deg);
+  transform: translate(calc(160% + var(--magnet-x, 0px)), calc(-125% + var(--magnet-y, 0px))) rotateZ(8deg) scale(1.12);
 }
 
 .folder.open .paper:nth-child(4):hover {
-  transform: translate(calc(140% + var(--magnet-x, 0px)), calc(-128% + var(--magnet-y, 0px))) rotateZ(12deg) scale(1.08);
+  transform: translate(calc(160% + var(--magnet-x, 0px)), calc(-138% + var(--magnet-y, 0px))) rotateZ(8deg) scale(1.22);
   z-index: 20;
-  box-shadow: 0 18px 40px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 20px 45px rgba(245, 158, 11, 0.5);
 }
 
 .folder.open .folder__front {
@@ -132,7 +134,8 @@
   z-index: 2;
   bottom: 8%;
   left: 50%;
-  transform: translate(-50%, 0%);
+  transform: translate(-50%, 0%) scale(0.6);
+  opacity: 0.7;
   width: 185px;
   height: 150px;
   background: var(--paper-1);
@@ -142,7 +145,7 @@
   -webkit-backdrop-filter: blur(16px);
   padding: 1rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
   display: flex;
   flex-direction: column;
   justify-content: center;
