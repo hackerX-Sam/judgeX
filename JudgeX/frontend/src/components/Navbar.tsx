@@ -100,7 +100,6 @@ export const Navbar = ({ active, transparent = false }: { active?: string; trans
       </div>
 
       <div className="lc-nav-right">
-        <BackgroundToggle />
         <ThemeToggle />
         <Link to="/settings" className={`lc-btn-settings ${active === 'settings' ? 'active' : ''}`}>
           <Settings size={15} />
