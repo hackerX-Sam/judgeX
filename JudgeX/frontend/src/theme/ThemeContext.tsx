@@ -22,6 +22,8 @@ const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   cursorStyle: 'line',
 };
 
+export type BackgroundMode = 'gridscan' | 'classic' | 'none';
+
 interface ThemeContextType {
   activeThemeId: ThemeId;
   activeTheme: ThemeDefinition;
@@ -29,18 +31,40 @@ interface ThemeContextType {
   editorSettings: EditorSettings;
   updateEditorSettings: (settings: Partial<EditorSettings>) => void;
   registerMonaco: (monaco: any) => void;
+  bgMode: BackgroundMode;
+  setBgMode: (mode: BackgroundMode) => void;
+  toggleBackground: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const STORAGE_THEME_KEY = 'judgex_theme';
 const STORAGE_EDITOR_KEY = 'judgex_editor_settings';
+const STORAGE_BG_KEY = 'judgex_bg_mode';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeThemeId, setActiveThemeId] = useState<ThemeId>(() => {
     const saved = localStorage.getItem(STORAGE_THEME_KEY) as ThemeId;
     return saved && THEMES[saved] ? saved : 'judgex-blue';
   });
+
+  const [bgMode, setBgModeState] = useState<BackgroundMode>(() => {
+    const saved = localStorage.getItem(STORAGE_BG_KEY) as BackgroundMode;
+    return saved && ['gridscan', 'classic', 'none'].includes(saved) ? saved : 'gridscan';
+  });
+
+  const setBgMode = useCallback((mode: BackgroundMode) => {
+    setBgModeState(mode);
+    localStorage.setItem(STORAGE_BG_KEY, mode);
+  }, []);
+
+  const toggleBackground = useCallback(() => {
+    setBgModeState(prev => {
+      const next: BackgroundMode = prev === 'gridscan' ? 'classic' : prev === 'classic' ? 'none' : 'gridscan';
+      localStorage.setItem(STORAGE_BG_KEY, next);
+      return next;
+    });
+  }, []);
 
   const [editorSettings, setEditorSettings] = useState<EditorSettings>(() => {
     try {
@@ -129,6 +153,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       editorSettings,
       updateEditorSettings,
       registerMonaco,
+      bgMode,
+      setBgMode,
+      toggleBackground,
     }}>
       {children}
     </ThemeContext.Provider>
@@ -142,3 +169,4 @@ export const useTheme = () => {
   }
   return context;
 };
+

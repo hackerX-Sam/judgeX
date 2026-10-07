@@ -6,6 +6,7 @@ import { API_URL } from '../../config';
 import { Navbar } from '../../components/Navbar';
 import MagneticCard from '../../components/MagneticCard';
 import AnimatedCounter from '../../components/AnimatedCounter';
+import TechText from '../../components/TechText';
 import { 
   Search, Compass, CheckCircle2, Circle, Trophy, Flame, 
   Sparkles, Code2, ArrowRight, Layers, X, RefreshCw, Filter, 
@@ -211,9 +212,19 @@ export default function ExplorePage() {
             <span>DISCOVER & PRACTICE</span>
           </div>
 
-          <h1 className="explore-title">
-            Explore. <span className="text-gradient-cyan">Solve. Evolve.</span>
-          </h1>
+          <div style={{ width: '100%', height: '100px', position: 'relative', margin: '0 auto 1rem' }}>
+            <TechText
+              text="Explore. Solve. Evolve."
+              fontWeight={900}
+              fontSize={80}
+              color="#ffffff"
+              accentColor="#38bdf8"
+              reveal="letter"
+              dashLength={4}
+              dashGap={2}
+              specks={15}
+            />
+          </div>
 
           <p className="explore-subtitle">
             Master algorithm challenges, filter curated topic tracks, track your personal progress, and benchmark your solutions in Docker sandboxes.

@@ -20,11 +20,15 @@ import ActivityGraph from './components/ActivityGraph';
 import { Navbar } from './components/Navbar';
 import ContestsPage from './pages/Contests/ContestsPage';
 import ExplorePage from './pages/Explore/ExplorePage';
+import DiscussPage from './pages/Discuss/DiscussPage';
 import SettingsPage from './pages/Settings/SettingsPage';
+import AdminPage from './pages/Admin/AdminPage';
 import { ThemeProvider } from './theme/ThemeContext';
 
 import ComputationalCanvas from './components/ComputationalCanvas';
 import CodeDnaCanvas from './components/CodeDnaCanvas';
+import GlobalBackground from './components/GlobalBackground';
+import TechText from './components/TechText';
 import AnimatedCounter from './components/AnimatedCounter';
 import MagneticCard from './components/MagneticCard';
 import InteractiveStoryline from './components/InteractiveStoryline';
@@ -184,8 +188,6 @@ const Welcome = () => {
 
   return (
     <div className="landing-page">
-      <ComputationalCanvas />
-      <CodeDnaCanvas />
       <Navbar active="home" transparent={true} />
 
       {/* Cinematic Hero */}
@@ -196,10 +198,32 @@ const Welcome = () => {
             <span>CODE IS IN OUR DNA</span>
           </div>
 
-          <h1 className="hero-title-main">
-            Master Code.<br />
-            <span className="text-gradient-cyan">Execute Without Limits.</span>
-          </h1>
+          <div style={{ width: '100%', height: '120px', position: 'relative', margin: '0 auto' }}>
+            <TechText
+              text="Master Code."
+              fontWeight={900}
+              fontSize={100}
+              color="#ffffff"
+              accentColor="#38bdf8"
+              reveal="letter"
+              dashLength={4}
+              dashGap={2}
+              specks={15}
+            />
+          </div>
+          <div style={{ width: '100%', height: '100px', position: 'relative', margin: '0 auto 1.5rem' }}>
+            <TechText
+              text="Execute Without Limits."
+              fontWeight={900}
+              fontSize={75}
+              color="#38bdf8"
+              accentColor="#06b6d4"
+              reveal="letter"
+              dashLength={4}
+              dashGap={2}
+              specks={15}
+            />
+          </div>
 
           <p className="hero-subtitle-main">
             The next-generation online coding judge. Write algorithms, execute code in isolated Docker sandboxes, and receive real-time AI performance intelligence.
@@ -459,14 +483,17 @@ const App = () => {
 
   return (
     <ThemeProvider>
+      <GlobalBackground />
       <Router>
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/home" element={<Welcome />} />
           <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/discuss" element={<DiscussPage />} />
           <Route path="/problems" element={<ProblemsPage />} />
           <Route path="/contest" element={<ContestsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/problems/:slug" element={<Workspace />} />

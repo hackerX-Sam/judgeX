@@ -39,3 +39,31 @@ export const requireAuth = async (req: AuthenticatedRequest, res: Response, next
     return res.status(500).json({ error: 'Failed to authenticate user' });
   }
 };
+
+export const requireAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    await requireAuth(req, res, async () => {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      // Check user role from Supabase profiles table
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+      if (profile?.role === 'admin' || req.user?.role === 'admin') {
+        return next();
+      }
+
+      return res.status(403).json({ error: 'Access denied: Admin authorization required' });
+    });
+  } catch (error: any) {
+    console.error('Admin Middleware Error:', error);
+    return res.status(500).json({ error: 'Authorization error' });
+  }
+};
+

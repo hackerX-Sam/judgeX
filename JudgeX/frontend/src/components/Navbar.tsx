@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Sun, Moon, Compass, Code2, Trophy, MessageSquare, Settings, User, LogOut } from 'lucide-react';
+import { Sun, Moon, Compass, Code2, Trophy, MessageSquare, Settings, User, LogOut, Grid, Sparkles } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { useTheme } from '../theme/ThemeContext';
 import { supabase } from '../config/supabase';
@@ -17,6 +17,45 @@ export const ThemeToggle = () => {
       title={activeTheme.isLight ? "Switch to JudgeX Dark Mode" : "Switch to Light Mode"}
     >
       {activeTheme.isLight ? <Moon size={16} /> : <Sun size={16} />}
+    </button>
+  );
+};
+
+export const BackgroundToggle = () => {
+  const { bgMode, setBgMode } = useTheme();
+  const isGridScan = bgMode === 'gridscan';
+
+  return (
+    <button
+      onClick={() => setBgMode(isGridScan ? 'classic' : 'gridscan')}
+      className="bg-toggle-btn"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px',
+        fontSize: '0.75rem',
+        fontWeight: 600,
+        padding: '0.4rem 0.7rem',
+        borderRadius: '8px',
+        background: isGridScan ? 'rgba(56, 189, 248, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+        border: isGridScan ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(59, 130, 246, 0.35)',
+        color: isGridScan ? '#38bdf8' : '#60a5fa',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+      title={isGridScan ? "Current: GridScan (React Bits). Click to revert to Classic Canvas." : "Current: Classic Canvas. Click to enable GridScan."}
+    >
+      {isGridScan ? (
+        <>
+          <Grid size={14} />
+          <span>GridScan</span>
+        </>
+      ) : (
+        <>
+          <Sparkles size={14} />
+          <span>Classic</span>
+        </>
+      )}
     </button>
   );
 };
@@ -53,10 +92,15 @@ export const Navbar = ({ active, transparent = false }: { active: string; transp
             <MessageSquare size={15} />
             <span>Discuss</span>
           </Link>
+          <Link to="/admin" className={active === 'admin' ? 'active' : ''}>
+            <Settings size={15} />
+            <span>Admin</span>
+          </Link>
         </div>
       </div>
 
       <div className="lc-nav-right">
+        <BackgroundToggle />
         <ThemeToggle />
         <Link to="/settings" className={`lc-btn-settings ${active === 'settings' ? 'active' : ''}`}>
           <Settings size={15} />
@@ -98,3 +142,4 @@ export const Navbar = ({ active, transparent = false }: { active: string; transp
 };
 
 export default Navbar;
+

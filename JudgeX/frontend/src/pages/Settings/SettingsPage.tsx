@@ -6,7 +6,7 @@ import { THEMES } from '../../theme/themeRegistry';
 import type { ThemeId } from '../../theme/themeRegistry';
 import { 
   User, Palette, Code2, Bell, Keyboard, Shield, Sliders, 
-  Sparkles, Check, Download, Monitor
+  Sparkles, Check, Download, Monitor, Grid
 } from 'lucide-react';
 import './SettingsPage.css';
 
@@ -14,7 +14,7 @@ type CategoryTab = 'account' | 'appearance' | 'editor' | 'notifications' | 'shor
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<CategoryTab>('appearance');
-  const { activeThemeId, setThemeId, editorSettings, updateEditorSettings } = useTheme();
+  const { activeThemeId, setThemeId, editorSettings, updateEditorSettings, bgMode, setBgMode } = useTheme();
   const user = useSelector((state: any) => state.auth.user);
 
   // Local notification & privacy preference state (saved to localStorage)
@@ -241,6 +241,58 @@ export default function SettingsPage() {
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Website Background Switcher & Revert Option */}
+                <div style={{ marginTop: '2.5rem', borderTop: '1px solid var(--jx-border)', paddingTop: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--jx-text)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Grid size={18} color="#38bdf8" />
+                    <span>Website Background Canvas</span>
+                  </h3>
+                  <p style={{ color: 'var(--jx-text-secondary)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                    Switch between React Bits GridScan futuristic background and the Classic JudgeX DNA canvas. You can revert at any time!
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                    <div 
+                      onClick={() => setBgMode('gridscan')}
+                      className={`theme-card ${bgMode === 'gridscan' ? 'selected' : ''}`}
+                      style={{ cursor: 'pointer', padding: '1rem' }}
+                    >
+                      <div style={{ fontWeight: 700, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Grid size={16} /> GridScan (React Bits)
+                      </div>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--jx-text-secondary)', marginTop: '0.5rem' }}>
+                        Cyberpunk animated WebGL scanner grid with Three.js postprocessing bloom.
+                      </p>
+                    </div>
+
+                    <div 
+                      onClick={() => setBgMode('classic')}
+                      className={`theme-card ${bgMode === 'classic' ? 'selected' : ''}`}
+                      style={{ cursor: 'pointer', padding: '1rem' }}
+                    >
+                      <div style={{ fontWeight: 700, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Sparkles size={16} /> Classic DNA Canvas (Revert)
+                      </div>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--jx-text-secondary)', marginTop: '0.5rem' }}>
+                        Original JudgeX interactive matrix grid & algorithm particle canvas.
+                      </p>
+                    </div>
+
+                    <div 
+                      onClick={() => setBgMode('none')}
+                      className={`theme-card ${bgMode === 'none' ? 'selected' : ''}`}
+                      style={{ cursor: 'pointer', padding: '1rem' }}
+                    >
+                      <div style={{ fontWeight: 700, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Monitor size={16} /> Minimalist Dark
+                      </div>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--jx-text-secondary)', marginTop: '0.5rem' }}>
+                        Clean solid background with no animated canvas effects.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

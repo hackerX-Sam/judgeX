@@ -3,10 +3,30 @@ import { PrismaClient } from '@prisma/client';
 import { submissionQueue, queueEvents, isRedisConnected } from '../queue/submission.queue';
 import { intelligenceQueue } from '../queue/intelligence.queue';
 import { runLocalCode } from '../services/localRunner';
+import { supabaseAdmin } from '../config/supabaseClient';
 
 const prisma = new PrismaClient();
 
-const processSubmissionLocally = async (submissionId: string, problem: any, code: string, language: string) => {
+const recordSupabaseProgress = async (userId: string, problemId: string, submissionId: string, status: string) => {
+  try {
+    if (!process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('placeholder')) return;
+    
+    if (status === 'ACCEPTED' && userId && problemId) {
+      await supabaseAdmin.from('user_problem_progress').upsert({
+        user_id: userId,
+        problem_id: problemId,
+        status: 'SOLVED',
+        best_submission_id: submissionId,
+        solved_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,problem_id' });
+    }
+  } catch (e: any) {
+    console.error('[Supabase Sync Warning]:', e.message);
+  }
+};
+
+const processSubmissionLocally = async (submissionId: string, problem: any, code: string, language: string, userId?: string) => {
   try {
     const testCases = problem.testCases || [];
     let finalStatus = 'ACCEPTED';
@@ -43,6 +63,10 @@ const processSubmissionLocally = async (submissionId: string, problem: any, code
       }
     });
 
+    if (userId && problem.id) {
+      recordSupabaseProgress(userId, problem.id, submissionId, finalStatus);
+    }
+
     try {
       if (isRedisConnected) {
         await intelligenceQueue.add('analyze', { action: 'analyze', submissionId });
@@ -58,6 +82,7 @@ const processSubmissionLocally = async (submissionId: string, problem: any, code
     });
   }
 };
+
 
 export const createSubmission = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -259,7 +284,23 @@ export const getSolvedProblems = async (req: Request, res: Response): Promise<an
       distinct: ['problemId']
     });
 
-    const solvedProblemIds = solvedSubmissions.map(s => s.problemId);
+    let solvedProblemIds = solvedSubmissions.map(s => s.problemId);
+
+    try {
+      if (process.env.SUPABASE_URL && !process.env.SUPABASE_URL.includes('placeholder')) {
+        const { data: progressData } = await supabaseAdmin
+          .from('user_problem_progress')
+          .select('problem_id')
+          .eq('user_id', userId)
+          .eq('status', 'SOLVED');
+
+        if (progressData && progressData.length > 0) {
+          const supabaseSolved = progressData.map((p: any) => p.problem_id);
+          solvedProblemIds = Array.from(new Set([...solvedProblemIds, ...supabaseSolved]));
+        }
+      }
+    } catch (e: any) {}
+
     res.status(200).json({ solvedProblemIds });
   } catch (error) {
     console.error('Error fetching solved problems:', error);
