@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, CSSProperties } from 'react';
+import React, { useEffect, useRef, type CSSProperties } from 'react';
 import './TechText.css';
 
 const LABEL_FONT = '10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';

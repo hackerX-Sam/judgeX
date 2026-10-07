@@ -83,7 +83,7 @@ export const FolderStats: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justify: 'center'
+        justifyContent: 'center'
       }}
     >
       {/* Header */}
@@ -123,7 +123,7 @@ export const FolderStats: React.FC = () => {
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center', 
-          justify: 'center', 
+          justifyContent: 'center', 
           position: 'relative',
           paddingTop: '60px',
           margin: '0 auto',
