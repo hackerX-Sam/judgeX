@@ -119,16 +119,19 @@ export const FolderStats: React.FC = () => {
       <div 
         style={{ 
           width: '100%', 
-          minHeight: '340px', 
+          minHeight: '380px', 
           display: 'flex', 
+          flexDirection: 'column',
           alignItems: 'center', 
           justify: 'center', 
           position: 'relative',
-          paddingTop: '60px'
+          paddingTop: '60px',
+          margin: '0 auto',
+          textAlign: 'center'
         }}
       >
         <Folder
-          size={1.25}
+          size={1.15}
           color="#2563eb"
           items={cards}
           isOpen={isOpen}
